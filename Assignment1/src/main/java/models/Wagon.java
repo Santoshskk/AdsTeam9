@@ -1,6 +1,6 @@
 package models;
 
-public class Wagon {
+public abstract class Wagon {
     protected int id;               // some unique ID of a Wagon
     private Wagon nextWagon;        // another wagon that is appended at the tail of this wagon
                                     // a.k.a. the successor of this wagon in a sequence
@@ -152,8 +152,21 @@ public class Wagon {
      * @param front the wagon to which this wagon must be attached to.
      */
     public void reAttachTo(Wagon front) {
-        // TODO detach any existing connections that will be rearranged
 
+        if (this.hasPreviousWagon()) {
+            this.detachFront();
+        }
+        if (front.hasNextWagon()) {
+            front.detachTail();
+        }
+
+        this.nextWagon = front.getNextWagon();
+        front.attachTail(this);
+
+
+        if (this.hasNextWagon()) {
+            this.getNextWagon().previousWagon = front;
+        }
         // TODO attach this wagon to its new predecessor front (sustaining the invariant propositions).
     }
 
@@ -162,7 +175,14 @@ public class Wagon {
      * and reconnects its tail to the wagon in front of it, if any.
      */
     public void removeFromSequence() {
-        // TODO
+
+        if (this.hasPreviousWagon()) {
+            Wagon predecessor = this.detachFront();
+
+            if (predecessor != null) {
+                predecessor.attachTail(this);
+            }
+        }
     }
 
 
@@ -176,7 +196,7 @@ public class Wagon {
         // TODO provide an iterative implementation,
         //   using attach- and detach methods of this class
 
-        return null;
+     return null;
     }
 
     // TODO string representation of a Wagon
