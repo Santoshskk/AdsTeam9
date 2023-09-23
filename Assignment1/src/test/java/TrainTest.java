@@ -163,6 +163,7 @@ public class TrainTest {
         assertEquals(30000, ((FreightWagon)(Object)(freightTrain.findWagonById(9003))).getMaxWeight());
         assertNull(freightTrain.findWagonById(9000));
         assertNull(trainWithoutWagons.findWagonById(8000));
+  
     }
 
     @Test

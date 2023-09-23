@@ -205,19 +205,28 @@ public class Train {
      * @return whether type and capacity of this train can accommodate attachment of the sequence
      */
     public boolean canAttach(Wagon wagon) {
-
+        int wagonSequenceCount = wagon.getSequenceLength();
         int wagonCount = getNumberOfWagons();
         int engineCapacity = engine.getMaxWagons();
+        boolean correctWagon = false;
+
+        if(wagonCount == 0) {
+            correctWagon = true;
+        }
 
         if((wagon instanceof PassengerWagon && isPassengerTrain()) ||
                 (wagon instanceof FreightWagon && isFreightTrain())) {
-            if(wagonCount <= engineCapacity && findWagonById(wagon.id) == null) {
+            correctWagon = true;
+        }
+        if(correctWagon) {
+            boolean isWagonPartOfTrain = findWagonById(wagon.id) != null;
+            if(wagonSequenceCount + 1 <= engineCapacity && !isWagonPartOfTrain) {
                 return true;
             }
-
         }
-       return false;
+        return false;
     }
+
 
     /**
      * Tries to attach the given sequence of wagons to the rear of the train
@@ -228,10 +237,25 @@ public class Train {
      * @return  whether the attachment could be completed successfully
      */
     public boolean attachToRear(Wagon wagon) {
-        // TODO
+        // Check if it's possible to attach the given sequence of wagons
+        if (canAttach(wagon)) {
 
-        return false;   // replace by proper outcome
+            if (firstWagon == null) {
+                firstWagon = wagon;
+            } else {
+                // Find the last wagon of the train
+                Wagon lastWagon = getLastWagonAttached();
+
+                // Attach the new sequence to the rear of the train
+                lastWagon.removeFromSequence();
+                wagon.attachTail(lastWagon);
+            }
+            return true;
+        }
+
+        return false;
     }
+
 
     /**
      * Tries to insert the given sequence of wagons at the front of the train
