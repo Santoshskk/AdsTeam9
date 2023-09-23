@@ -195,7 +195,7 @@ public abstract class Wagon {
     public Wagon reverseSequence() {
         // TODO provide an iterative implementation,
         //   using attach- and detach methods of this class
-
+        //hallo
      return null;
     }
 
