@@ -46,5 +46,8 @@ public class TrainsMain {
         System.out.println("Total number of seats: " + amsterdamParis.getTotalNumberOfSeats());
         System.out.println(amsterdamLondon);
         System.out.println("Total number of seats: " + amsterdamLondon.getTotalNumberOfSeats());
+
+
+
     }
 }

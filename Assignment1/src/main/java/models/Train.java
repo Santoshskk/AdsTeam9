@@ -58,25 +58,40 @@ public class Train {
      * @param wagon the first wagon of a sequence of wagons to be attached (can be null)
      */
     public void setFirstWagon(Wagon wagon) {
-        // TODO
+        firstWagon = wagon;
     }
 
     /**
      * @return  the number of Wagons connected to the train
      */
+    /**
+     * @return  the number of Wagons connected to the train
+     */
     public int getNumberOfWagons() {
-        // TODO
+        int count = 0;
+        Wagon currentWagon = firstWagon;
 
-        return 0;   // replace by proper outcome
+        //loop keeps going till currentwagon is null
+        while (currentWagon != null) {
+            count++;
+            currentWagon = currentWagon.getNextWagon();
+        }
+
+        return count;
     }
+
 
     /**
      * @return  the last wagon attached to the train
      */
     public Wagon getLastWagonAttached() {
         // TODO
-
-        return null;    // replace by proper outcome
+        Wagon currentWagon = firstWagon;
+        if(currentWagon == null) {
+            return null;
+        }
+        Wagon lastWagon = currentWagon.getLastWagonAttached();
+        return lastWagon;
     }
 
     /**
@@ -84,9 +99,18 @@ public class Train {
      *          (return 0 for a freight train)
      */
     public int getTotalNumberOfSeats() {
-        // TODO
-
-        return 0;   // replace by proper outcome
+        Wagon currentWagon = firstWagon;
+        int numberOfSeats = 0;
+            while (currentWagon != null) {
+                if (currentWagon instanceof PassengerWagon) {
+                    numberOfSeats += ((PassengerWagon) currentWagon).getNumberOfSeats();
+                }
+                else {
+                    numberOfSeats = 0;
+                }
+                currentWagon = currentWagon.getNextWagon();
+            }
+        return numberOfSeats;
     }
 
     /**
@@ -97,8 +121,20 @@ public class Train {
      */
     public int getTotalMaxWeight() {
         // TODO
+        Wagon currentWagon = firstWagon;
 
-        return 0;   // replace by proper outcome
+        int maxWeight = 0;
+        while (currentWagon != null) {
+            if (currentWagon instanceof FreightWagon) {
+                maxWeight += ((FreightWagon) currentWagon).getMaxWeight();
+            }
+            else {
+                maxWeight = 0;
+            }
+            currentWagon = currentWagon.getNextWagon();
+        }
+        return maxWeight;
+
     }
 
      /**
@@ -108,9 +144,18 @@ public class Train {
      *          (return null if the position is not valid for this train)
      */
     public Wagon findWagonAtPosition(int position) {
-        // TODO
 
-        return null;    // replace by proper outcome
+        Wagon currentWagon = firstWagon;
+        //the length of the sequence of wagons towards the end of its tail
+        int WagonLength =  currentWagon.getSequenceLength();
+
+        for (int i = 0; i <= WagonLength; i++) {
+           if(i == position) {
+               return currentWagon;
+           }
+            currentWagon = currentWagon.getNextWagon();
+        }
+            return null;
     }
 
     /**
