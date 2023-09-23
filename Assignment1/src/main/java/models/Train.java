@@ -248,7 +248,7 @@ public class Train {
 
                 // Attach the new sequence to the rear of the train
                 lastWagon.removeFromSequence();
-                wagon.attachTail(lastWagon);
+                wagon.attachTail(wagon);
             }
             return true;
         }
