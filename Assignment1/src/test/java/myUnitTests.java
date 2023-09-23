@@ -19,7 +19,7 @@ public class myUnitTests {
     Wagon freightWagon1, freightWagon2;
     Wagon freightWagon9001, freightWagon9002;
 
-
+        //hallo
     @BeforeEach
     public void setup() {
         Locale.setDefault(Locale.ENGLISH);
