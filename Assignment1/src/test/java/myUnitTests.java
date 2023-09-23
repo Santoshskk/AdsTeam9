@@ -70,5 +70,8 @@ public class myUnitTests {
 
     }
 
+    public void hoiid() {
+        assertEquals(50000, ((FreightWagon)(Object)(freightTrain.findWagonById(9001))).getMaxWeight());
 
+    }
 }
