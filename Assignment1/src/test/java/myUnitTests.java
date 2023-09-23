@@ -12,12 +12,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 //unit test class to test a methods while developing
 
-
-
 public class myUnitTests {
-
     Train passengerTrain, trainWithoutWagons, freightTrain;
-
     Wagon passengerWagon1, passengerWagon2, passengerWagon3;
     Wagon passengerWagon8001, passengerWagon8002;
     Wagon freightWagon1, freightWagon2;
@@ -67,4 +63,12 @@ public class myUnitTests {
     public void getNumberOfWagonsTest() {
         assertEquals(7, passengerTrain.getNumberOfWagons());
     }
+    @Test
+    //one of my own tests
+    public void findID() {
+        assertEquals(50000, ((FreightWagon)(Object)(freightTrain.findWagonById(9001))).getMaxWeight());
+
+    }
+
+
 }

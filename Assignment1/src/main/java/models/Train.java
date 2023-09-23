@@ -146,14 +146,22 @@ public class Train {
     public Wagon findWagonAtPosition(int position) {
 
         Wagon currentWagon = firstWagon;
+
+        if(currentWagon == null) {
+            return null;
+        }
+
         //the length of the sequence of wagons towards the end of its tail
         int WagonLength =  currentWagon.getSequenceLength();
 
-        for (int i = 0; i <= WagonLength; i++) {
+        for (int i = 0; i < WagonLength; i++) {
            if(i == position) {
                return currentWagon;
            }
             currentWagon = currentWagon.getNextWagon();
+        }
+        if(position > WagonLength || position < 0 ) {
+            return null;
         }
             return null;
     }
@@ -165,9 +173,26 @@ public class Train {
      *          (return null if no wagon was found with the given wagonId)
      */
     public Wagon findWagonById(int wagonId) {
-        // TODO
+        Wagon currentWagon = firstWagon;
 
-        return null;    // replace by proper outcome
+        if(currentWagon == null) {
+            return null;
+        }
+
+        //the length of the sequence of wagons towards the end of its tail
+        int WagonLength =  currentWagon.getSequenceLength();
+
+        for (int i = 0; i <= WagonLength; i++) {
+            if(currentWagon == null) {
+                return null;
+            }
+            if (currentWagon.getId() == wagonId) {
+                return currentWagon;
+            }
+            currentWagon = currentWagon.getNextWagon();
+        }
+
+        return null;
     }
 
     /**
@@ -180,9 +205,18 @@ public class Train {
      * @return whether type and capacity of this train can accommodate attachment of the sequence
      */
     public boolean canAttach(Wagon wagon) {
-        // TODO
 
-        return false;   // replace by proper outcome
+        int wagonCount = getNumberOfWagons();
+        int engineCapacity = engine.getMaxWagons();
+
+        if((wagon instanceof PassengerWagon && isPassengerTrain()) ||
+                (wagon instanceof FreightWagon && isFreightTrain())) {
+            if(wagonCount <= engineCapacity && findWagonById(wagon.id) == null) {
+                return true;
+            }
+
+        }
+       return false;
     }
 
     /**
@@ -281,4 +315,15 @@ public class Train {
     }
 
     // TODO string representation of a train
+
+
+    @Override
+    public String toString() {
+        return "Train{" +
+                "origin='" + origin + '\'' +
+                ", destination='" + destination + '\'' +
+                ", engine=" + engine +
+                ", firstWagon=" + firstWagon +
+                '}';
+    }
 }
