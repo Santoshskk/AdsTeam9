@@ -195,15 +195,15 @@ public class Train {
         return null;
     }
 
-    /**
-     * Determines if the given sequence of wagons can be attached to this train
-     * Verifies if the type of wagons match the type of train (Passenger or Freight)
-     * Verifies that the capacity of the engine is sufficient to also pull the additional wagons
-     * Verifies that the wagon is not part of the train already
-     * Ignores the predecessors before the head wagon, if any
-     * @param wagon the head wagon of a sequence of wagons to consider for attachment
-     * @return whether type and capacity of this train can accommodate attachment of the sequence
-     */
+        /**
+         * Determines if the given sequence of wagons can be attached to this train
+         * Verifies if the type of wagons match the type of train (Passenger or Freight)
+         * Verifies that the capacity of the engine is sufficient to also pull the additional wagons
+         * Verifies that the wagon is not part of the train already
+         * Ignores the predecessors before the head wagon, if any
+         * @param wagon the head wagon of a sequence of wagons to consider for attachment
+         * @return whether type and capacity of this train can accommodate attachment of the sequence
+         */
     public boolean canAttach(Wagon wagon) {
         int wagonSequenceCount = wagon.getSequenceLength();
         int wagonCount = getNumberOfWagons();
@@ -220,9 +220,10 @@ public class Train {
         }
         if(correctWagon) {
             boolean isWagonPartOfTrain = findWagonById(wagon.id) != null;
-            if(wagonSequenceCount + 1 <= engineCapacity && !isWagonPartOfTrain) {
+            if(wagonCount + wagonSequenceCount <= engineCapacity && !isWagonPartOfTrain) {
                 return true;
             }
+
         }
         return false;
     }
