@@ -210,14 +210,13 @@ public class Train {
         int engineCapacity = engine.getMaxWagons();
         boolean correctWagon = false;
 
-        if(wagonCount == 0) {
-            correctWagon = true;
+        if (wagonCount == 0) {
+            if ((wagon instanceof PassengerWagon && isPassengerTrain()) ||
+                    (wagon instanceof FreightWagon && isFreightTrain())) {
+                correctWagon = true;
+            }
         }
 
-        if((wagon instanceof PassengerWagon && isPassengerTrain()) ||
-                (wagon instanceof FreightWagon && isFreightTrain())) {
-            correctWagon = true;
-        }
         if(correctWagon) {
             boolean isWagonPartOfTrain = findWagonById(wagon.id) != null;
             if(wagonCount + wagonSequenceCount <= engineCapacity && !isWagonPartOfTrain) {
