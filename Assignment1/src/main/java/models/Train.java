@@ -85,7 +85,6 @@ public class Train {
      * @return  the last wagon attached to the train
      */
     public Wagon getLastWagonAttached() {
-        // TODO
         Wagon currentWagon = firstWagon;
         if(currentWagon == null) {
             return null;
@@ -211,10 +210,12 @@ public class Train {
         boolean correctWagon = false;
 
         if (wagonCount == 0) {
-            if ((wagon instanceof PassengerWagon && isPassengerTrain()) ||
-                    (wagon instanceof FreightWagon && isFreightTrain())) {
-                correctWagon = true;
-            }
+            correctWagon = true;
+        }
+
+        if ((wagon instanceof PassengerWagon && isPassengerTrain()) ||
+                (wagon instanceof FreightWagon && isFreightTrain())) {
+            correctWagon = true;
         }
 
         if(correctWagon) {
@@ -242,16 +243,15 @@ public class Train {
 
             if (firstWagon == null) {
                 firstWagon = wagon;
-            } else {
+            }
                 // Find the last wagon of the train
                 Wagon lastWagon = getLastWagonAttached();
 
                 // Attach the new sequence to the rear of the train
                 lastWagon.removeFromSequence();
                 wagon.attachTail(wagon);
+                return true;
             }
-            return true;
-        }
 
         return false;
     }
