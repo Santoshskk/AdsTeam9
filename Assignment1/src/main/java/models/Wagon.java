@@ -194,11 +194,12 @@ public abstract class Wagon {
      */
     public void removeFromSequence() {
         if (this.previousWagon != null) {
-            this.previousWagon.nextWagon = this.nextWagon;
+            this.previousWagon.nextWagon = this.nextWagon;// dit slaat this over en verwijst naar de volgende
         }
         if (this.nextWagon != null) {
-            this.nextWagon.previousWagon = this.previousWagon;
+            this.nextWagon.previousWagon = this.previousWagon;// dit slaat de this over en gaan naar de volgende
         }
+
         this.previousWagon = null;
         this.nextWagon = null;
     }
