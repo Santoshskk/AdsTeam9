@@ -35,7 +35,6 @@ public class MyUnitTestTrain {
     public void testAttachNullWagonToRear() {
         assertFalse(passengerTrain.attachToRear(null));
     }
-
     @Test
     public void testAttachWagonToRear() {
         Wagon newWagon = (Wagon)(Object)new PassengerWagon(8004, 45);

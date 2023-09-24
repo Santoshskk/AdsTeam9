@@ -228,7 +228,7 @@ public abstract class Wagon {
 
 
             newOrder = beforeLastWagon;
-            // stop if the beforeLastWagon and this are the same
+            // stop if the beforeLastWagon and this the same
             if (beforeLastWagon == this) {
                 break;
             }
@@ -236,6 +236,8 @@ public abstract class Wagon {
 
         return lastWagon;
     }
+
+
 
 
 }
