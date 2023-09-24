@@ -149,31 +149,22 @@ public class Train {
         Wagon currentWagon = firstWagon;
 
         if (currentWagon == null) {
-            System.out.println("The train has no wagons.");
             return null;
         }
 
         int WagonLength = getNumberOfWagons();
-        System.out.println("Number of wagons in the train: " + WagonLength);
 
-        // Check for out of bounds position
         if (position >= WagonLength || position < 0) {
-            System.out.println("Position " + position + " is out of bounds.");
             return null;
         }
 
-        // Loop through wagons using 0-based indexing.
+        // Loop through wagons
         for (int i = 0; i < WagonLength; i++) {
-            System.out.println("Checking wagon at position " + i + ", wagon ID: " + currentWagon.getId());
-
             if (i == position) {
                 return currentWagon;
             }
             currentWagon = currentWagon.getNextWagon();
         }
-
-        // If we've looped through all wagons and haven't found the one at the given position
-        System.out.println("Wagon not found at position " + position);
         return null;
     }
 
@@ -263,7 +254,7 @@ public class Train {
             return false;
         }
 
-        // Detach the wagon from its predecessors
+        // Detach the wagon
         if (wagon.hasPreviousWagon()) {
             wagon.getPreviousWagon().setNextWagon(null);
             wagon.setPreviousWagon(null);
@@ -285,7 +276,7 @@ public class Train {
             wagon.setPreviousWagon(lastWagon);
         }
 
-        return true; // Attachment was successful
+        return true;
     }
 
 
@@ -336,7 +327,7 @@ public class Train {
             return false;
         }
 
-        // Calculate the total number of wagons after the insertion
+        // Calculate the total number of wagons after the insert
         int totalWagonsAfterInsertion = getNumberOfWagons() + wagon.getSequenceLength();
 
         // Check if the position is valid and if the train can accommodate the new wagons
@@ -344,7 +335,7 @@ public class Train {
             return false;
         }
 
-        // Detach the wagon from its predecessors
+        // Detach the wagon
         if (wagon.hasPreviousWagon()) {
             wagon.getPreviousWagon().setNextWagon(null);
             wagon.setPreviousWagon(null);
@@ -356,7 +347,6 @@ public class Train {
             return true;
         }
 
-        // If inserting at the beginning
         if (position == 0) {
             insertAtFront(wagon);
             return true;
@@ -393,7 +383,7 @@ public class Train {
         // FindwagonId in the current train
         Wagon wagonToMove = findWagonById(wagonId);
         if (wagonToMove == null) {
-            return false;  // Wagon not found in this train
+            return false;
         }
 
         // Check compatibility
@@ -510,10 +500,6 @@ public class Train {
         sb.append(" with ").append(getNumberOfWagons())
                 .append(" wagons from ").append(origin)
                 .append(" to ").append(destination);
-
-
-
-        // Here you might add the "Configurator result" if you have the necessary logic for that.
 
         return sb.toString();
     }
