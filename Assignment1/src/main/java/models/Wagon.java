@@ -94,13 +94,17 @@ public abstract class Wagon {
     public void attachTail(Wagon tail) {
         // TODO verify the exceptions
 
+        if (tail== null){
+            return;
+        }
+
         if(this.hasNextWagon()){
             throw new IllegalStateException(
-                    String.format("%s is already pulling %s", this.getId(), this.getNextWagon().getId())
+                    String.format("%s is already pulling %s", this, this.getNextWagon())
             );
         }else if (tail.hasPreviousWagon()) {
             throw new IllegalStateException(
-                    String.format("%s has already been attached to %s", tail.getId(), tail.getPreviousWagon().getId())
+                    String.format("%s has already been attached to %s", tail, tail.getPreviousWagon())
             );
         }
         // TODO attach the tail wagon to this wagon (sustaining the invariant propositions).
@@ -201,11 +205,9 @@ public abstract class Wagon {
      * @return the new start Wagon of the reversed sequence (with is the former last Wagon of the original sequence)
      */
     public Wagon reverseSequence() {
-        // TODO provide an iterative implementation,
-        //   using attach- and detach methods of this class
-        //hallo
-     return null;
+        return null;
     }
 
-    // TODO string representation of a Wagon
+
+
 }
