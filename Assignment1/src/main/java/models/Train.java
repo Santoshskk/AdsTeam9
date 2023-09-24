@@ -19,6 +19,7 @@ public class Train {
 
     /**
      * Indicates whether the train has at least one connected Wagon
+     *
      * @return
      */
     public boolean hasWagons() {
@@ -29,6 +30,7 @@ public class Train {
     /**
      * A train is a passenger train when its first wagon is a PassengerWagon
      * (we do not worry about the posibility of mixed compositions here)
+     *
      * @return
      */
     public boolean isPassengerTrain() {
@@ -38,6 +40,7 @@ public class Train {
     /**
      * A train is a freight train when its first wagon is a FreightWagon
      * (we do not worry about the posibility of mixed compositions here)
+     *
      * @return
      */
     public boolean isFreightTrain() {
@@ -55,6 +58,7 @@ public class Train {
     /**
      * Replaces the current sequence of wagons (if any) in the train
      * by the given new sequence of wagons (if any)
+     *
      * @param wagon the first wagon of a sequence of wagons to be attached (can be null)
      */
     public void setFirstWagon(Wagon wagon) {
@@ -62,10 +66,10 @@ public class Train {
     }
 
     /**
-     * @return  the number of Wagons connected to the train
+     * @return the number of Wagons connected to the train
      */
     /**
-     * @return  the number of Wagons connected to the train
+     * @return the number of Wagons connected to the train
      */
     public int getNumberOfWagons() {
         int count = 0;
@@ -73,8 +77,8 @@ public class Train {
 
         //loop keeps going till currentwagon is null
         while (currentWagon != null) {
-            count++;
             currentWagon = currentWagon.getNextWagon();
+            count++;
         }
 
         return count;
@@ -82,11 +86,11 @@ public class Train {
 
 
     /**
-     * @return  the last wagon attached to the train
+     * @return the last wagon attached to the train
      */
     public Wagon getLastWagonAttached() {
         Wagon currentWagon = firstWagon;
-        if(currentWagon == null) {
+        if (currentWagon == null) {
             return null;
         }
         Wagon lastWagon = currentWagon.getLastWagonAttached();
@@ -94,29 +98,28 @@ public class Train {
     }
 
     /**
-     * @return  the total number of seats on a passenger train
-     *          (return 0 for a freight train)
+     * @return the total number of seats on a passenger train
+     * (return 0 for a freight train)
      */
     public int getTotalNumberOfSeats() {
         Wagon currentWagon = firstWagon;
         int numberOfSeats = 0;
-            while (currentWagon != null) {
-                if (currentWagon instanceof PassengerWagon) {
-                    numberOfSeats += ((PassengerWagon) currentWagon).getNumberOfSeats();
-                }
-                else {
-                    numberOfSeats = 0;
-                }
-                currentWagon = currentWagon.getNextWagon();
+        while (currentWagon != null) {
+            if (currentWagon instanceof PassengerWagon) {
+                numberOfSeats += ((PassengerWagon) currentWagon).getNumberOfSeats();
+            } else {
+                numberOfSeats = 0;
             }
+            currentWagon = currentWagon.getNextWagon();
+        }
         return numberOfSeats;
     }
 
     /**
      * calculates the total maximum weight of a freight train
-     * @return  the total maximum weight of a freight train
-     *          (return 0 for a passenger train)
      *
+     * @return the total maximum weight of a freight train
+     * (return 0 for a passenger train)
      */
     public int getTotalMaxWeight() {
         // TODO
@@ -126,8 +129,7 @@ public class Train {
         while (currentWagon != null) {
             if (currentWagon instanceof FreightWagon) {
                 maxWeight += ((FreightWagon) currentWagon).getMaxWeight();
-            }
-            else {
+            } else {
                 maxWeight = 0;
             }
             currentWagon = currentWagon.getNextWagon();
@@ -136,53 +138,65 @@ public class Train {
 
     }
 
-     /**
+    /**
      * Finds the wagon at the given position (starting at 0 for the first wagon of the train)
+     *
      * @param position
-     * @return  the wagon found at the given position
-     *          (return null if the position is not valid for this train)
+     * @return the wagon found at the given position
+     * (return null if the position is not valid for this train)
      */
     public Wagon findWagonAtPosition(int position) {
-
         Wagon currentWagon = firstWagon;
 
-        if(currentWagon == null) {
+        if (currentWagon == null) {
+            System.out.println("The train has no wagons.");
             return null;
         }
 
-        //the length of the sequence of wagons towards the end of its tail
-        int WagonLength =  currentWagon.getSequenceLength();
+        int WagonLength = getNumberOfWagons();
+        System.out.println("Number of wagons in the train: " + WagonLength);
 
+        // Check for out of bounds position
+        if (position >= WagonLength || position < 0) {
+            System.out.println("Position " + position + " is out of bounds.");
+            return null;
+        }
+
+        // Loop through wagons using 0-based indexing.
         for (int i = 0; i < WagonLength; i++) {
-           if(i == position) {
-               return currentWagon;
-           }
+            System.out.println("Checking wagon at position " + i + ", wagon ID: " + currentWagon.getId());
+
+            if (i == position) {
+                return currentWagon;
+            }
             currentWagon = currentWagon.getNextWagon();
         }
-        if(position > WagonLength || position < 0 ) {
-            return null;
-        }
-            return null;
+
+        // If we've looped through all wagons and haven't found the one at the given position
+        System.out.println("Wagon not found at position " + position);
+        return null;
     }
+
 
     /**
      * Finds the wagon with a given wagonId
+     *
      * @param wagonId
-     * @return  the wagon found
-     *          (return null if no wagon was found with the given wagonId)
+     * @return the wagon found
+     * (return null if no wagon was found with the given wagonId)
      */
     public Wagon findWagonById(int wagonId) {
         Wagon currentWagon = firstWagon;
 
-        if(currentWagon == null) {
+        if (currentWagon == null) {
             return null;
         }
 
         //the length of the sequence of wagons towards the end of its tail
-        int WagonLength =  currentWagon.getSequenceLength();
+        int WagonLength = currentWagon.getSequenceLength();
 
         for (int i = 0; i <= WagonLength; i++) {
-            if(currentWagon == null) {
+            if (currentWagon == null) {
                 return null;
             }
             if (currentWagon.getId() == wagonId) {
@@ -194,15 +208,16 @@ public class Train {
         return null;
     }
 
-        /**
-         * Determines if the given sequence of wagons can be attached to this train
-         * Verifies if the type of wagons match the type of train (Passenger or Freight)
-         * Verifies that the capacity of the engine is sufficient to also pull the additional wagons
-         * Verifies that the wagon is not part of the train already
-         * Ignores the predecessors before the head wagon, if any
-         * @param wagon the head wagon of a sequence of wagons to consider for attachment
-         * @return whether type and capacity of this train can accommodate attachment of the sequence
-         */
+    /**
+     * Determines if the given sequence of wagons can be attached to this train
+     * Verifies if the type of wagons match the type of train (Passenger or Freight)
+     * Verifies that the capacity of the engine is sufficient to also pull the additional wagons
+     * Verifies that the wagon is not part of the train already
+     * Ignores the predecessors before the head wagon, if any
+     *
+     * @param wagon the head wagon of a sequence of wagons to consider for attachment
+     * @return whether type and capacity of this train can accommodate attachment of the sequence
+     */
     public boolean canAttach(Wagon wagon) {
         int wagonSequenceCount = wagon.getSequenceLength();
         int wagonCount = getNumberOfWagons();
@@ -218,9 +233,9 @@ public class Train {
             correctWagon = true;
         }
 
-        if(correctWagon) {
+        if (correctWagon) {
             boolean isWagonPartOfTrain = findWagonById(wagon.id) != null;
-            if(wagonCount + wagonSequenceCount <= engineCapacity && !isWagonPartOfTrain) {
+            if (wagonCount + wagonSequenceCount <= engineCapacity && !isWagonPartOfTrain) {
                 return true;
             }
 
@@ -234,28 +249,33 @@ public class Train {
      * No change is made if the attachment cannot be made.
      * (when the sequence is not compatible or the engine has insufficient capacity)
      * if attachment is possible, the head wagon is first detached from its predecessors, if any
+     *
      * @param wagon the head wagon of a sequence of wagons to be attached
-     * @return  whether the attachment could be completed successfully
+     * @return whether the attachment could be completed successfully
      */
     public boolean attachToRear(Wagon wagon) {
-        // Check if it's possible to attach the given sequence of wagons
-        if (canAttach(wagon)) {
+        if (wagon == null) {
+            return false; // Return false if the provided wagon is null
+        }
 
-            if (firstWagon == null) {
-                firstWagon = wagon;
-            }
-                // Find the last wagon of the train
-                Wagon lastWagon = getLastWagonAttached();
+        // Detach the wagon from its current sequence
+        if (wagon.hasPreviousWagon()) {
+            wagon.removeFromSequence();
+        }
 
-                // Attach the new sequence to the rear of the train
-                lastWagon.removeFromSequence();
-                wagon.attachTail(wagon);
+        if (firstWagon == null) {
+            firstWagon = wagon; // Make the provided wagon the first wagon if the train has no wagons
+            return true;
+        } else {
+            if (canAttach(wagon)) {
+                Wagon lastWagon = firstWagon.getLastWagonAttached();
+                lastWagon.attachTail(wagon); // Attach the provided wagon to the tail of the last wagon
                 return true;
             }
+        }
 
-        return false;
+        return false;  // Return false if the wagon could not be attached
     }
-
 
 
     /**
@@ -264,14 +284,41 @@ public class Train {
      * No change is made if the insertion cannot be made.
      * (when the sequence is not compatible or the engine has insufficient capacity)
      * if insertion is possible, the head wagon is first detached from its predecessors, if any
+     *
      * @param wagon the head wagon of a sequence of wagons to be inserted
-     * @return  whether the insertion could be completed successfully
+     * @return whether the insertion could be completed successfully
      */
     public boolean insertAtFront(Wagon wagon) {
-        // TODO
+        if (!canAttach(wagon)) {
+            return false;
+        }
+        //Detachment
+        if (wagon.hasPreviousWagon()) {
+            wagon.removeFromSequence();
+        }
 
-        return false;   // replace by proper outcome
+        //Insert wagon at the Front with Sequence Attachment to the tail
+        if (hasWagons()) {
+            Wagon tailOfInsertingSequence = findTailOfSequence(wagon);
+            tailOfInsertingSequence.attachTail(firstWagon);
+        }
+
+        //this wagon = first wagon
+        firstWagon = wagon;
+        return true;
     }
+    private Wagon findTailOfSequence(Wagon wagon) {
+        Wagon Tail = wagon;
+        while (Tail.hasNextWagon()) {
+            Tail = Tail.getNextWagon();
+        }
+        return Tail;
+    }
+
+
+
+
+
 
     /**
      * Tries to insert the given sequence of wagons at/before the given position in the train.
