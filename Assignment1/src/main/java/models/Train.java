@@ -255,27 +255,39 @@ public class Train {
      */
     public boolean attachToRear(Wagon wagon) {
         if (wagon == null) {
-            return false; // Return false if the provided wagon is null
+            return false;
         }
 
-        // Detach the wagon from its current sequence
+        // Check if the wagon is already part of this train
+        if (findWagonById(wagon.id) != null) {
+            return false;
+        }
+
+        // Detach the wagon from its predecessors
         if (wagon.hasPreviousWagon()) {
-            wagon.removeFromSequence();
+            wagon.getPreviousWagon().setNextWagon(null);
+            wagon.setPreviousWagon(null);
         }
 
-        if (firstWagon == null) {
-            firstWagon = wagon; // Make the provided wagon the first wagon if the train has no wagons
-            return true;
+        // Check if there's capacity to attach the wagon sequence
+        int totalWagons = getNumberOfWagons();
+        int wagonsToAttach = wagon.getSequenceLength();
+        if (totalWagons + wagonsToAttach > this.engine.getMaxWagons()) {
+            return false; // Not enough capacity to attach the wagons
+        }
+
+        // Attach the wagon (or sequence) to the rear of the train
+        if (this.firstWagon == null) {
+            this.firstWagon = wagon;
         } else {
-            if (canAttach(wagon)) {
-                Wagon lastWagon = firstWagon.getLastWagonAttached();
-                lastWagon.attachTail(wagon); // Attach the provided wagon to the tail of the last wagon
-                return true;
-            }
+            Wagon lastWagon = this.firstWagon.getLastWagonAttached();
+            lastWagon.setNextWagon(wagon);
+            wagon.setPreviousWagon(lastWagon);
         }
 
-        return false;  // Return false if the wagon could not be attached
+        return true; // Attachment was successful
     }
+
 
 
     /**
@@ -316,29 +328,61 @@ public class Train {
     }
 
 
-
-
-
-
-    /**
-     * Tries to insert the given sequence of wagons at/before the given position in the train.
-     * (The current wagon at given position including all its successors shall then be reattached
-     *    after the last wagon of the given sequence.)
-     * No change is made if the insertion cannot be made.
-     * (when the sequence is not compatible or the engine has insufficient capacity
-     *    or the given position is not valid for insertion into this train)
-     * if insertion is possible, the head wagon of the sequence is first detached from its predecessors, if any
-     * @param position the position where the head wagon and its successors shall be inserted
-     *                 0 <= position <= numWagons
-     *                 (i.e. insertion immediately after the last wagon is also possible)
-     * @param wagon the head wagon of a sequence of wagons to be inserted
-     * @return  whether the insertion could be completed successfully
-     */
     public boolean insertAtPosition(int position, Wagon wagon) {
-        // TODO
+        boolean isWagonPartOfTrain = findWagonById(wagon.id) != null;
 
-        return false;   // replace by proper outcome
+        // Check if the wagon is null or already part of this train
+        if (isWagonPartOfTrain) {
+            return false;
+        }
+
+        // Calculate the total number of wagons after the insertion
+        int totalWagonsAfterInsertion = getNumberOfWagons() + wagon.getSequenceLength();
+
+        // Check if the position is valid and if the train can accommodate the new wagons
+        if (position < 0 || position > getNumberOfWagons() || totalWagonsAfterInsertion > this.engine.getMaxWagons()) {
+            return false;
+        }
+
+        // Detach the wagon from its predecessors
+        if (wagon.hasPreviousWagon()) {
+            wagon.getPreviousWagon().setNextWagon(null);
+            wagon.setPreviousWagon(null);
+        }
+
+        // If the train is empty or the position is at the end, just attach to the rear
+        if (this.firstWagon == null || position == getNumberOfWagons()) {
+            attachToRear(wagon);
+            return true;
+        }
+
+        // If inserting at the beginning
+        if (position == 0) {
+            insertAtFront(wagon);
+            return true;
+        }
+
+        // Navigate to the specified position
+        Wagon currentWagon = this.firstWagon;
+        for (int i = 0; i < position - 1; i++) {
+            currentWagon = currentWagon.getNextWagon();
+        }
+
+        // Insert the sequence at the specified position and reattach the rest
+        Wagon nextWagon = currentWagon.getNextWagon();
+        currentWagon.setNextWagon(wagon);
+        wagon.setPreviousWagon(currentWagon);
+
+        Wagon lastInsertedWagon = wagon.getLastWagonAttached();
+        lastInsertedWagon.setNextWagon(nextWagon);
+        if (nextWagon != null) {
+            nextWagon.setPreviousWagon(lastInsertedWagon);
+        }
+
+        return true;
     }
+
+
 
     /**
      * Tries to remove one Wagon with the given wagonId from this train

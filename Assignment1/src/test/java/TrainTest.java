@@ -18,6 +18,9 @@ public class TrainTest {
 
     @BeforeEach
     public void setup() {
+
+        System.out.println("start");
+
         Locale.setDefault(Locale.ENGLISH);
         Locomotive rembrandt = new Locomotive(24531, 8);
         passengerTrain = new Train(rembrandt, "Amsterdam", "Paris");
@@ -197,7 +200,7 @@ public class TrainTest {
     }
 
     @Test
-    public void T17_CanAttachToRear() {
+        public void T17_CanAttachToRear() {
         assertTrue(trainWithoutWagons.attachToRear(passengerTrain.getLastWagonAttached()),
                 "can attach a single wagon to an empty train");
         assertEquals(8007, trainWithoutWagons.getFirstWagon().getId(),
@@ -210,9 +213,17 @@ public class TrainTest {
 
         assertTrue(trainWithoutWagons.attachToRear(passengerWagon8002),
                 "can attach a sequence at at the rear of a train");
+
+
         assertEquals(8002, trainWithoutWagons.findWagonAtPosition(2).getId(),
                 "attachToRear should disconnect and reattach the head wagon to the rear");
-        assertEquals(8003, trainWithoutWagons.findWagonAtPosition(3).getId(),
+
+
+        System.out.println( trainWithoutWagons.getNumberOfWagons()); //output is 3
+
+        System.out.println(trainWithoutWagons.getNumberOfWagons());
+
+        assertEquals(8003, trainWithoutWagons.findWagonAtPosition(3).getId(), //fail test because position 3 doesnt exist. there r only 3 wagons
                 "attachToRear should disconnect and reattach the complete sequence to the rear");
         assertEquals(8004, trainWithoutWagons.findWagonAtPosition(4).getId(),
                 "attachToRear should disconnect and reattach the complete sequence to the rear");

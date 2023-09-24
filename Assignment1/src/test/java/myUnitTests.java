@@ -69,6 +69,28 @@ public class myUnitTests {
         assertEquals(50000, ((FreightWagon)(Object)(freightTrain.findWagonById(9001))).getMaxWeight());
 
     }
+    @Test
+    public void findbyPosition() {
+
+        assertTrue(trainWithoutWagons.attachToRear(passengerTrain.getLastWagonAttached()),
+                "can attach a single wagon to an empty train");
+        assertEquals(8007, trainWithoutWagons.getFirstWagon().getId(),
+                "attachToRear should disconnect and reattach the given head wagon");
+
+        assertTrue(trainWithoutWagons.attachToRear(passengerTrain.getLastWagonAttached()),
+                "can attach a single wagon at the rear of a train");
+        assertEquals(8006, trainWithoutWagons.getLastWagonAttached().getId(),
+                "attachToRear should disconnect and reattach the given head wagon to the rear");
+
+        assertTrue(trainWithoutWagons.attachToRear(passengerWagon8002),
+                "can attach a sequence at at the rear of a train");
+
+        //assertEquals(8003, trainWithoutWagons.findWagonAtPosition(3).getId());
+        assertEquals(8002, trainWithoutWagons.findWagonAtPosition(2).getId());
+       int test = trainWithoutWagons.findWagonAtPosition(3).getId();
+      //  System.out.println(test);
+    }
+
 
     public void hoiid() {
         assertEquals(50000, ((FreightWagon)(Object)(freightTrain.findWagonById(9001))).getMaxWeight());
