@@ -494,6 +494,28 @@ public class Train {
 
     @Override
     public String toString() {
-        return "";
+        StringBuilder sb = new StringBuilder();
+
+        // Add the locomotive
+        sb.append("[").append("Loco").append(engine.getLocNumber()).append("]"); // Assuming engine has a meaningful toString()
+
+        // Add each wagon
+        Wagon currentWagon = firstWagon;
+        while (currentWagon != null) {
+            sb.append("[").append(currentWagon).append("]"); // Assuming Wagon has a meaningful toString()
+            currentWagon = currentWagon.getNextWagon();
+        }
+
+        // Add train details
+        sb.append(" with ").append(getNumberOfWagons())
+                .append(" wagons from ").append(origin)
+                .append(" to ").append(destination);
+
+
+
+        // Here you might add the "Configurator result" if you have the necessary logic for that.
+
+        return sb.toString();
     }
+
 }
