@@ -384,22 +384,44 @@ public class Train {
 
 
 
-    /**
-     * Tries to remove one Wagon with the given wagonId from this train
-     * and attach it at the rear of the given toTrain
-     * No change is made if the removal or attachment cannot be made
-     * (when the wagon cannot be found, or the trains are not compatible
-     * or the engine of toTrain has insufficient capacity)
-     * @param wagonId   the id of the wagon to be removed
-     * @param toTrain   the train to which the wagon shall be attached
-     *                  toTrain shall be different from this train
-     * @return  whether the move could be completed successfully
-     */
     public boolean moveOneWagon(int wagonId, Train toTrain) {
-        // TODO
+        // Check if toTrain is not the same as the current train
+        if (this == toTrain) {
+            return false;
+        }
 
-        return false;   // replace by proper outcome
-     }
+        // FindwagonId in the current train
+        Wagon wagonToMove = findWagonById(wagonId);
+        if (wagonToMove == null) {
+            return false;  // Wagon not found in this train
+        }
+
+        // Check compatibility
+        if (!toTrain.canAttach(wagonToMove)) {
+            return false;
+        }
+
+        // Remove the wagon from the current train
+        if (wagonToMove.hasPreviousWagon()) {
+            wagonToMove.getPreviousWagon().setNextWagon(wagonToMove.getNextWagon());
+        } else {
+            // If the wagon to move is the first wagon, update the firstWagon reference
+            this.firstWagon = wagonToMove.getNextWagon();
+        }
+        if (wagonToMove.hasNextWagon()) {
+            wagonToMove.getNextWagon().setPreviousWagon(wagonToMove.getPreviousWagon());
+        }
+
+        // Detach the wagon from its previous and next wagons
+        wagonToMove.setPreviousWagon(null);
+        wagonToMove.setNextWagon(null);
+
+        // Attach the wagon to the rear of toTrain
+        toTrain.attachToRear(wagonToMove);
+
+        return true;
+    }
+
 
     /**
      * Tries to split this train before the wagon at given position and move the complete sequence
@@ -413,33 +435,65 @@ public class Train {
      * @return  whether the move could be completed successfully
      */
     public boolean splitAtPosition(int position, Train toTrain) {
-        // TODO
+        // Check if toTrain is the same as the current train or if position is invalid
+        if (this == toTrain || position < 0 || position >= getNumberOfWagons()) {
+            return false;
+        }
 
-        return false;   // replace by proper outcome
+        // Navigate to the wagon at the given position
+        Wagon currentWagon = firstWagon;
+        for (int i = 0; i < position; i++) {
+            currentWagon = currentWagon.getNextWagon();
+        }
+
+        // Check compatibility of trains and capacity of toTrain's engine
+        if (!toTrain.canAttach(currentWagon)) {
+            return false;
+        }
+
+        // Detach the sequence starting from currentWagon from this train
+        if (currentWagon.hasPreviousWagon()) {
+            currentWagon.getPreviousWagon().setNextWagon(null);
+            currentWagon.setPreviousWagon(null);
+        } else {
+            // If the currentWagon is the first wagon, update the firstWagon reference of this train
+            this.firstWagon = null;
+        }
+
+        // Attach the sequence to the rear of toTrain
+        toTrain.attachToRear(currentWagon);
+
+        return true;
     }
 
-    /**
-     * Reverses the sequence of wagons in this train (if any)
-     * i.e. the last wagon becomes the first wagon
-     *      the previous wagon of the last wagon becomes the second wagon
-     *      etc.
-     * (No change if the train has no wagons or only one wagon)
-     */
+
     public void reverse() {
-        // TODO
+        if (firstWagon == null || !firstWagon.hasNextWagon()) {
+            // No wagons - so no need to reverse
+            return;
+        }
+        Wagon currentWagon = firstWagon;
+        Wagon prevWagon = null;
 
+        //reverse  direction
+        while (currentWagon != null) {
+            Wagon nextWagon = currentWagon.getNextWagon();
+            currentWagon.setNextWagon(prevWagon);
+            currentWagon.setPreviousWagon(nextWagon);
+            prevWagon = currentWagon;
+            currentWagon = nextWagon;
+        }
+
+        // Update the first wagon to be the original last wagon
+        firstWagon = prevWagon;
     }
+
 
     // TODO string representation of a train
 
 
     @Override
     public String toString() {
-        return "Train{" +
-                "origin='" + origin + '\'' +
-                ", destination='" + destination + '\'' +
-                ", engine=" + engine +
-                ", firstWagon=" + firstWagon +
-                '}';
+        return "";
     }
 }
