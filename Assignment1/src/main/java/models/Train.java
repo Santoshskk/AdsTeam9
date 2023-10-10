@@ -465,7 +465,7 @@ public class Train {
         Wagon currentWagon = firstWagon;
         Wagon prevWagon = null;
 
-        //reverse  direction
+        //reverse the direction
         while (currentWagon != null) {
             Wagon nextWagon = currentWagon.getNextWagon();
             currentWagon.setNextWagon(prevWagon);
