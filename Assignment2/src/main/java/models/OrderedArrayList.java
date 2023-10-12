@@ -145,8 +145,6 @@ public class OrderedArrayList<E>
 
 
     //O(log n)
-
-
     public int indexOfByRecursiveBinarySearch(E searchItem) {
         // Recursive binary search in the sorted section
         int index = recursiveBinarySearch(0, nSorted - 1, searchItem);
@@ -226,14 +224,15 @@ public class OrderedArrayList<E>
      * @return          the total sum of all contributions
      */
     @Override
-    public double aggregate(Function<E,Double> mapper) {
+    public double aggregate(Function<E, Double> mapper) {
         double sum = 0.0;
 
-        // TODO loop over all items and use the mapper
-        //  to calculate and accumulate the contribution of each item
-
-
+        for (E item : this) {
+            double contribution = mapper.apply(item);
+            sum += contribution;
+        }
 
         return sum;
     }
+
 }

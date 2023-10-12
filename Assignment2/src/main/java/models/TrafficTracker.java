@@ -193,8 +193,6 @@ public class TrafficTracker {
     }
 
 
-
-
     /**
      * helper method to create a scanner on a file and handle the exception
      * @param file
