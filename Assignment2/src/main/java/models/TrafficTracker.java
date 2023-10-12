@@ -70,8 +70,6 @@ public class TrafficTracker {
             //  retrieve a list of all files and sub folders in this directory
             File[] filesInDirectory = Objects.requireNonNullElse(file.listFiles(), new File[0]);
 
-            // TODO recursively process all files and sub folders from the filesInDirectory list.
-            //  also track the total number of offences found
             for (File subFile : filesInDirectory) {
                 totalNumberOfOffences += mergeDetectionsFromVaultRecursively(subFile);
             }
@@ -97,18 +95,12 @@ public class TrafficTracker {
         // use a regular ArrayList to load the raw detection info from the file
         List<Detection> newDetections = new ArrayList<>();
 
-        // TODO import all detections from the specified file into the newDetections list
-        //  using the importItemsFromFile helper method and the Detection.fromLine parser.
-
         importItemsFromFile(newDetections, file, line -> Detection.fromLine(line, cars));
 
         System.out.printf("Imported %d detections from %s.\n", newDetections.size(), file.getPath());
 
         int totalNumberOfOffences = 0; // tracks the number of offences that emerges from the data in this file
 
-        // TODO validate all detections against the purple criteria and
-        //  merge any resulting offences into this.violations, accumulating offences per car and per city
-        //  also keep track of the totalNumberOfOffences for reporting
         for(Detection detection : newDetections) {
             if(detection.validatePurple() != null) {
                 this.violations.add(detection.validatePurple());
@@ -127,14 +119,18 @@ public class TrafficTracker {
      * @return      the total amount of money recovered from all violations
      */
     public double calculateTotalFines() {
-
-        return this.violations.aggregate(
-                // TODO provide a calculator function for the specified fine scheme
-                //  of €25 per truck-offence and €35 per coach-offence
-
-                null  // replace this reference
-        );
+        return this.violations.aggregate(violation -> {
+            Car.CarType carType = violation.getCar().getCarType(); // Assuming Violation has a getCar() method
+            int offencesCount = violation.getOffencesCount();
+            if (carType == Car.CarType.Truck) {
+                return (double) (25 * offencesCount);
+            } else if (carType == Car.CarType.Coach) {
+                return (double) (35 * offencesCount);
+            }
+            return 0.0; // return 0 if the car type is neither Truck nor Coach
+        });
     }
+
 
     /**
      * Prepares a list of topNumber of violations that show the highest offencesCount
