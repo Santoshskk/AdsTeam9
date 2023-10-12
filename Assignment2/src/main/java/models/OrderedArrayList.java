@@ -45,14 +45,33 @@ public class OrderedArrayList<E>
         this.nSorted = this.size();
     }
 
-    // TODO override the ArrayList.add(index, item), ArrayList.remove(index) and Collection.remove(object) methods
-    //  such that they both meet the ArrayList contract of these methods (see ArrayList JavaDoc)
-    //  and sustain the representation invariant of OrderedArrayList
-    //  (hint: only change nSorted as required to guarantee the representation invariant,
-    //   do not invoke a sort or reorder items otherwise differently than is specified by the ArrayList contract)
-
-
-
+    @Override
+    public void add(int index, E element) {
+        super.add(index, element);
+        // If an element is added to the sorted section, the sorted section is no longer fully sorted
+        if (index < nSorted) {
+            nSorted = index; // Update nSorted to the index where the new element was added
+        }
+    }
+    @Override
+    public E remove(int index) {
+        E removedElement = super.remove(index);
+        // If an element is removed from the sorted section, the sorted section remains sorted
+        // But if an element is removed from the unsorted section, nSorted should not change
+        if (index < nSorted) {
+            nSorted--; // Decrease nSorted by 1 as one element is removed from the sorted section
+        }
+        return removedElement;
+    }
+    @Override
+    public boolean remove(Object o) {
+        int index = indexOf(o);
+        if (index >= 0) {
+            remove(index);
+            return true;
+        }
+        return false;
+    }
 
     @Override
     public void sort() {
@@ -185,10 +204,6 @@ public class OrderedArrayList<E>
         return -1;
     }
 
-
-
-
-
     /**
      * finds a match of newItem in the list and applies the merger operator with the newItem to that match
      * i.e. the found match is replaced by the outcome of the merge between the match and the newItem
@@ -209,11 +224,16 @@ public class OrderedArrayList<E>
             this.add(newItem);
             return true;
         } else {
-            // TODO retrieve the matched item and
-            //  replace the matched item in the list with the merger of the matched item and the newItem
 
 
+            // Retrieve the matched item
+            E matchedItem = this.get(matchedItemIndex);
 
+            // Merge the matched item and the new item
+            E mergedItem = merger.apply(matchedItem, newItem);
+
+            // Replace the matched item in the list with the merged item
+            this.set(matchedItemIndex, mergedItem);
             return false;
         }
     }
