@@ -1,7 +1,6 @@
 package models;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
@@ -15,12 +14,15 @@ public class TrafficTracker {
     private OrderedList<Violation> violations;      // the accumulation of all offences by car and by city
 
     public TrafficTracker() {
-        // TODO initialize cars with an empty ordered list which sorts items by licensePlate.
-        //  initalize violations with an empty ordered list which sorts items by car and city.
-        //  Use your generic implementation class OrderedArrayList
+        // Initialize cars with an empty ordered list which sorts items by licensePlate.
+        this.cars = new OrderedArrayList<>(Comparator.comparing(Car::getLicensePlate));
 
-
+        // Initialize violations with an empty ordered list which sorts items by car and city.
+        this.violations = new OrderedArrayList<>(Comparator
+                .comparing(Violation::getCar)
+                .thenComparing(Violation::getCity));
     }
+
 
     /**
      * imports all registered cars from a resource file that has been provided by the RDW
@@ -70,9 +72,9 @@ public class TrafficTracker {
 
             // TODO recursively process all files and sub folders from the filesInDirectory list.
             //  also track the total number of offences found
-
-
-
+            for (File subFile : filesInDirectory) {
+                totalNumberOfOffences += mergeDetectionsFromVaultRecursively(subFile);
+            }
         } else if (file.getName().matches(TRAFFIC_FILE_PATTERN)) {
             // the file is a regular file that matches the target pattern for raw detection files
             // process the content of this file and merge the offences found into this.violations
@@ -98,7 +100,7 @@ public class TrafficTracker {
         // TODO import all detections from the specified file into the newDetections list
         //  using the importItemsFromFile helper method and the Detection.fromLine parser.
 
-
+        importItemsFromFile(newDetections, file, line -> Detection.fromLine(line, cars));
 
         System.out.printf("Imported %d detections from %s.\n", newDetections.size(), file.getPath());
 
@@ -107,12 +109,17 @@ public class TrafficTracker {
         // TODO validate all detections against the purple criteria and
         //  merge any resulting offences into this.violations, accumulating offences per car and per city
         //  also keep track of the totalNumberOfOffences for reporting
-
-
-
-
+        for(Detection detection : newDetections) {
+            if(detection.validatePurple() != null) {
+                this.violations.add(detection.validatePurple());
+                totalNumberOfOffences++;
+            }
+        }
         return totalNumberOfOffences;
     }
+
+
+
 
     /**
      * calculates the total revenue of fines from all violations,
@@ -164,38 +171,33 @@ public class TrafficTracker {
     }
 
 
-    /**
-     * imports a collection of items from a text file which provides one line for each item
-     * @param items         the list to which imported items shall be added
-     * @param file          the source text file
-     * @param converter     a function that can convert a text line into a new item instance
-     * @param <E>           the (generic) type of each item
-     */
-    public static <E> int importItemsFromFile(List<E> items, File file, Function<String,E> converter) {
+    public static <E> int importItemsFromFile(List<E> items, File file, Function<String, E> converter) {
         int numberOfLines = 0;
 
         Scanner scanner = createFileScanner(file);
 
-        // read all source lines from the scanner,
+        // Read all source lines from the scanner,
         // convert each line to an item of type E
         // and add each successfully converted item into the list
         while (scanner.hasNext()) {
-            // input another line with author information
+            // Input another line with information
             String line = scanner.nextLine();
             numberOfLines++;
 
-            // TODO convert the line to an instance of E
+            // Convert the line to an instance of E using the provided converter function
+            E item = converter.apply(line);
 
-
-
-            // TODO add a successfully converted item to the list of items
-
-
+            // Add a successfully converted item to the list of items
+            if (item != null) {
+                items.add(item);
+            }
         }
 
-        //System.out.printf("Imported %d lines from %s.\n", numberOfLines, file.getPath());
         return numberOfLines;
     }
+
+
+
 
     /**
      * helper method to create a scanner on a file and handle the exception
