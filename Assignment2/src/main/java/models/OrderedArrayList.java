@@ -92,16 +92,46 @@ public class OrderedArrayList<E>
      */
     public int indexOfByIterativeBinarySearch(E searchItem) {
 
-        // TODO implement an iterative binary search on the sorted section of the arrayList, 0 <= index < nSorted
-        //   to find the position of an item that matches searchItem (this.sortOrder comparator yields a 0 result)
-
-
-
-        // TODO if no match was found, attempt a linear search of searchItem in the section nSorted <= index < size()
-
-
-        return -1;  // nothing was found ???
+        // Recursive binary search in the sorted section
+        int index = IterativeBinarySearch(0, nSorted - 1, searchItem);
+        // If item is found in the sorted section, return its index
+        if (index != -1) {
+            return index;
+        }
+        // Linear search in the unsorted section
+        for (int i = nSorted; i < size(); i++) {
+            if (this.sortOrder.compare(get(i), searchItem) == 0) {
+                return i;
+            }
+        }
+        // Item not found in either section
+        return -1;
     }
+
+
+    private int IterativeBinarySearch(int start, int end, E searchItem) {
+        while (start <= end) {
+            int mid = start + (end - start) / 2;
+            int comparison = this.sortOrder.compare(get(mid), searchItem);
+
+            // Item found
+            if (comparison == 0) {
+                return mid;
+            }
+            // Item is on the left side of array
+            if (comparison > 0) {
+                end = mid - 1;
+            }
+            // Item is on the right side of array
+            else {
+                start = mid + 1;
+            }
+        }
+        // Item not found in the sorted section
+        return -1;
+    }
+
+
 
     /**
      * finds the position of the searchItem by a recursive binary search algorithm in the
