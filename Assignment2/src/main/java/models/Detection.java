@@ -1,9 +1,8 @@
 package models;
-
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-
 import static models.Car.CarType;
 import static models.Car.FuelType;
 
@@ -35,16 +34,51 @@ public class Detection {
      * @return a new Detection instance with the provided information
      * or null if the textLine is corrupt or incomplete
      */
+
+
     public static Detection fromLine(String textLine, List<Car> cars) {
         Detection newDetection = null;
 
-        // TODO convert the information in the textLine into a new Detection instance
-        //  use the cars.indexOf to find the car that is associated with the licensePlate of the detection
-        //  if no car can be found a new Car shall be instantiated and added to the list and associated with the detection
+        // Split the textLine into its components
+        String[] parts = textLine.split(",");
 
+        // Check if there are enough components (licensePlate, city, dateTime)
+        if (parts.length == 3) {
+            String licensePlate = parts[0].trim();
+            String city = parts[1].trim();
+            String dateTimeStr = parts[2].trim();
+
+            // Define the DateTimeFormatter for the expected date and time format
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+
+
+            // Parse the dateTime string into a LocalDateTime using the formatter
+            LocalDateTime dateTime = LocalDateTime.parse(dateTimeStr, formatter);
+
+            // Search for a matching car in the list
+            int carIndex = -1;
+            for (int i = 0; i < cars.size(); i++) {
+                if (cars.get(i).getLicensePlate().equals(licensePlate)) {
+                    carIndex = i;
+                    break;
+                }
+            }
+
+            // If no matching car was found, create a new Car instance
+            if (carIndex == -1) {
+                Car newCar = new Car(licensePlate); // You need to implement a Car constructor
+                cars.add(newCar);
+                carIndex = cars.size() - 1; // Set the index to the newly added car
+            }
+
+            // Create a new Detection instance with the specific LocalDateTime
+            Car matchedCar = cars.get(carIndex); // Retrieve the matched car
+            newDetection = new Detection(matchedCar, city, dateTime); // You need to implement a Detection constructor
+        }
 
         return newDetection;
     }
+
 
     /**
      * Validates a detection against the purple conditions for entering an environmentally restricted zone
@@ -55,8 +89,15 @@ public class Detection {
      */
     public Violation validatePurple() {
         // TODO validate that diesel trucks and diesel coaches have an emission category of 6 or above
-
-
+        CarType carType = car.getCarType();
+        FuelType fuelType = car.getFuelType();
+        int emissionCategory = car.getEmissionCategory();
+        if(carType == CarType.Truck && fuelType == FuelType.Diesel || carType == CarType.Coach && fuelType == FuelType.Diesel) {
+            if(emissionCategory < 6) {
+                Violation violation = new Violation(car, city);
+                return violation;
+            }
+        }
         return null;
     }
 
@@ -75,9 +116,8 @@ public class Detection {
 
     @Override
     public String toString() {
-        // TODO represent the detection in the format: licensePlate/city/dateTime
-
-        return "TODO:Detection.toString";       // replace by a proper outcome
+        String formattedDateTime = dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
+        return car.getLicensePlate() + "/" + city + "/" + formattedDateTime;
     }
 
 }
