@@ -16,6 +16,8 @@ public class OrderedArrayList<E>
     //      other items at index position nSorted <= index < size() can be in any order amongst themselves
     //              and also relative to the sorted section
 
+
+
     public OrderedArrayList() {
         this(null);
     }
@@ -110,18 +112,52 @@ public class OrderedArrayList<E>
      * @param searchItem    the item to be searched on the basis of comparison by this.sortOrder
      * @return              the position index of the found item in the arrayList, or -1 if no item matches the search item.
      */
+
+
+    //O(log n)
+
+
     public int indexOfByRecursiveBinarySearch(E searchItem) {
-
-        // TODO implement a recursive binary search on the sorted section of the arrayList, 0 <= index < nSorted
-        //   to find the position of an item that matches searchItem (this.sortOrder comparator yields a 0 result)
-
-
-
-        // TODO if no match was found, attempt a linear search of searchItem in the section nSorted <= index < size()
-
-
-        return -1;  // nothing was found ???
+        // Recursive binary search in the sorted section
+        int index = recursiveBinarySearch(0, nSorted - 1, searchItem);
+        // If item is found in the sorted section, return its index
+        if (index != -1) {
+            return index;
+        }
+        // Linear search in the unsorted section
+        for (int i = nSorted; i < size(); i++) {
+            if (this.sortOrder.compare(get(i), searchItem) == 0) {
+                return i;
+            }
+        }
+        // Item not found in either section
+        return -1;
     }
+
+
+    private int recursiveBinarySearch(int start, int end, E searchItem) {
+        if (start <= end) {
+            int mid = start + (end - start) / 2;
+            //A negative int if the new mid-variable is "less than" the searchItem.
+            //Zero if they are equal
+            //A positive integer if the new mid-variable is "greater than" the searchItem.
+            int comparison = this.sortOrder.compare(get(mid), searchItem);
+            // Item found
+            if (comparison == 0) {
+                return mid;
+            }
+            // Item is on the left side of array
+            if (comparison > 0) {
+                return recursiveBinarySearch(start, mid - 1, searchItem);
+            }
+            // Item is on the right side of array
+            return recursiveBinarySearch(mid + 1, end, searchItem);
+        }
+        // Item not found in the sorted section
+        return -1;
+    }
+
+
 
 
 
