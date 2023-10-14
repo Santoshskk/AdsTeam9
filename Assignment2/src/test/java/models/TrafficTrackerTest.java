@@ -56,4 +56,12 @@ public class TrafficTrackerTest {
         assertEquals(7, trafficTracker.getViolations().stream().mapToInt(Violation::getOffencesCount).sum(),
                 "Total number of offences across all Violation instances did not match.");
     }
+
+
+
+    @Test
+    public void myTest() {
+        assertEquals(2, trafficTracker.getViolations().size(),
+                "Did not find the right number of Violation instances for different cars in different cities");
+    }
 }
