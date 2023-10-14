@@ -16,11 +16,7 @@ public class TrafficTracker {
     public TrafficTracker() {
         // Initialize cars with an empty ordered list which sorts items by licensePlate.
         this.cars = new OrderedArrayList<>(Comparator.comparing(Car::getLicensePlate));
-
-        // Initialize violations with an empty ordered list which sorts items by car and city.
-        this.violations = new OrderedArrayList<>(Comparator
-                .comparing(Violation::getCar)
-                .thenComparing(Violation::getCity));
+        this.violations = new OrderedArrayList<>(Violation::compareByLicensePlateAndCity);
     }
 
 
@@ -88,12 +84,10 @@ public class TrafficTracker {
      * @param file
      */
     private int mergeDetectionsFromFile(File file) {
-        this.violations.sort();
+        this.violations.sort(Violation::compareByLicensePlateAndCity);
         List<Detection> newDetections = new ArrayList<>();
         importItemsFromFile(newDetections, file, line -> Detection.fromLine(line, cars));
-        System.out.printf("Imported %d detections from %s.\n", newDetections.size(), file.getPath());
         int totalNumberOfOffences = 0;
-
         for (Detection detection : newDetections) {
             Violation newViolation = detection.validatePurple();
             if (newViolation != null) {
@@ -101,7 +95,8 @@ public class TrafficTracker {
                 for (Violation existingViolation : this.violations) {
                     if (existingViolation.getCar().equals(newViolation.getCar()) &&
                             existingViolation.getCity().equals(newViolation.getCity())) {
-                        existingViolation.setOffencesCount(existingViolation.getOffencesCount() + 1);
+                        Violation combinedViolation = existingViolation.combineOffencesCounts(newViolation);
+                        existingViolation.setOffencesCount(combinedViolation.getOffencesCount());
                         violationExists = true;
                         break;
                     }
@@ -114,6 +109,9 @@ public class TrafficTracker {
         }
         return totalNumberOfOffences;
     }
+
+
+
 
 
 
