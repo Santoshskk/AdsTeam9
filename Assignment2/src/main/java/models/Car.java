@@ -52,7 +52,6 @@ public class Car implements Comparable<Car> {
      */
     public static Car fromLine(String textLine) {
         Car newCar = null;
-
         // extract the comma-separated fields from the textLine
         String[] fields = textLine.split(",");
         if (fields.length >= 5) {
@@ -71,7 +70,6 @@ public class Car implements Comparable<Car> {
                 System.out.println(e.getMessage());
             }
         }
-
         return newCar;
     }
 

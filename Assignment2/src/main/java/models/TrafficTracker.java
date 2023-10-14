@@ -26,7 +26,6 @@ public class TrafficTracker {
      */
     public void importCarsFromVault(String resourceName) {
         this.cars.clear();
-
         // load all cars from the text file
         int numberOfLines = importItemsFromFile(this.cars,
                 createFileFromURL(TrafficTracker.class.getResource(resourceName)),
