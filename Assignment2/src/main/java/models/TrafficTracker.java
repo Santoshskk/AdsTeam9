@@ -108,15 +108,6 @@ public class TrafficTracker {
         return totalNumberOfOffences;
     }
 
-
-
-
-
-
-
-
-
-
     /**
      * calculates the total revenue of fines from all violations,
      * Trucks pay €25 per offence, Coaches €35 per offence
@@ -124,7 +115,7 @@ public class TrafficTracker {
      */
     public double calculateTotalFines() {
         return this.violations.aggregate(violation -> {
-            Car.CarType carType = violation.getCar().getCarType(); // Assuming Violation has a getCar() method
+            Car.CarType carType = violation.getCar().getCarType();
             int offencesCount = violation.getOffencesCount();
             if (carType == Car.CarType.Truck) {
                 return (double) (25 * offencesCount);
