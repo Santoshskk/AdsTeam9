@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class DetectionTest2 {
     private Detection vehicle;
-    Car scoda, audi, bmw, mercedes, icova, volvo1, volvo2, daf1, daf2, kamaz;
+    Car bmw;
 
     @BeforeEach
     void setUp() {

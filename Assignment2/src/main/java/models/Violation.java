@@ -10,7 +10,6 @@ public class Violation {
         this.city = city;
         this.offencesCount = 1;
     }
-
     public static int compareByLicensePlateAndCity(Violation v1, Violation v2) {
 
         // Compare by license plate
@@ -62,6 +61,8 @@ public class Violation {
     public void setOffencesCount(int offencesCount) {
         this.offencesCount = offencesCount;
     }
+
+
 
 
     @Override

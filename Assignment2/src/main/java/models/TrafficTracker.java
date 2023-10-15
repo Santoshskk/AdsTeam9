@@ -235,4 +235,8 @@ public class TrafficTracker {
     public OrderedList<Violation> getViolations() {
         return this.violations;
     }
+
+    public void setViolations(OrderedList<Violation> violations) {
+        this.violations = violations;
+    }
 }
