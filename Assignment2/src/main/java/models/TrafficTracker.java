@@ -19,7 +19,6 @@ public class TrafficTracker {
         this.violations = new OrderedArrayList<>(Violation::compareByLicensePlateAndCity);
     }
 
-
     /**
      * imports all registered cars from a resource file that has been provided by the RDW
      * @param resourceName

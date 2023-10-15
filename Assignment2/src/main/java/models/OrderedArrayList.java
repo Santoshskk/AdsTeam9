@@ -111,7 +111,7 @@ public class OrderedArrayList<E>
      */
     public int indexOfByIterativeBinarySearch(E searchItem) {
 
-        // Recursive binary search in the sorted section
+
         int index = IterativeBinarySearch(0, nSorted - 1, searchItem);
         // If item is found in the sorted section, return its index
         if (index != -1) {
@@ -132,7 +132,6 @@ public class OrderedArrayList<E>
         while (start <= end) {
             int mid = start + (end - start) / 2;
             int comparison = this.sortOrder.compare(get(mid), searchItem);
-
             // Item found
             if (comparison == 0) {
                 return mid;
