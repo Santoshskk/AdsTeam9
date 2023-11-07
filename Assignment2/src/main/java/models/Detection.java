@@ -38,7 +38,6 @@ public class Detection {
 
     public static Detection fromLine(String textLine, List<Car> cars) {
         Detection newDetection = null;
-
         // Split the textLine into its components
         String[] parts = textLine.split(",");
 
@@ -47,14 +46,10 @@ public class Detection {
             String licensePlate = parts[0].trim();
             String city = parts[1].trim();
             String dateTimeStr = parts[2].trim();
-
             // Define the DateTimeFormatter for the expected date and time format
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-
-
             // Parse the dateTime string into a LocalDateTime using the formatter
             LocalDateTime dateTime = LocalDateTime.parse(dateTimeStr, formatter);
-
             // Search for a matching car in the list
             int carIndex = -1;
             for (int i = 0; i < cars.size(); i++) {
@@ -63,7 +58,6 @@ public class Detection {
                     break;
                 }
             }
-
             // If no matching car was found, create a new Car instance
             if (carIndex == -1) {
                 Car newCar = new Car(licensePlate); // You need to implement a Car constructor
@@ -75,7 +69,6 @@ public class Detection {
             Car matchedCar = cars.get(carIndex); // Retrieve the matched car
             newDetection = new Detection(matchedCar, city, dateTime); // You need to implement a Detection constructor
         }
-
         return newDetection;
     }
 
