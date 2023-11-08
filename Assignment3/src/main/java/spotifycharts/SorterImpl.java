@@ -7,21 +7,36 @@ import java.util.List;
 public class SorterImpl<E> implements Sorter<E> {
 
     /**
-     * Sorts all items by selection or insertion sort using the provided comparator
+     * Sorts all items by selection or insertion or bubble sort using the provided comparator
      * for deciding relative ordening of two items
      * Items are sorted 'in place' without use of an auxiliary list or array
+     *
      * @param items
      * @param comparator
-     * @return  the items sorted in place
+     * @return the items sorted in place
      */
+
+    //implemeted bubble sort
     public List<E> selInsBubSort(List<E> items, Comparator<E> comparator) {
-        // TODO implement selection sort or insertion sort or bubble sort
-
-
-
-
-        return items;   // replace as you find appropriate
+        boolean doItAgain = false;
+        int limit = items.size();
+        for (int i = 0; i < limit - 1; i++) {
+            E thisValue = items.get(i);
+            E nextValue = items.get(i + 1);
+            if (comparator.compare(thisValue, nextValue) > 0) {
+                // Swap elements
+                items.set(i, nextValue);
+                items.set(i + 1, thisValue);
+                doItAgain = true; // A swap occurred so check again
+            }
+        }
+        //recursively call the function to continue sorting
+        if (doItAgain) {
+            selInsBubSort(items, comparator);
+        }
+        return items;
     }
+
 
     /**
      * Sorts all items by quick sort using the provided comparator
