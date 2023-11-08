@@ -37,7 +37,6 @@ public class SorterImpl<E> implements Sorter<E> {
         return items;
     }
 
-
     /**
      * Sorts all items by quick sort using the provided comparator
      * for deciding relative ordening of two items
@@ -46,14 +45,45 @@ public class SorterImpl<E> implements Sorter<E> {
      * @param comparator
      * @return  the items sorted in place
      */
+    //divide and Conquer algoritme
     public List<E> quickSort(List<E> items, Comparator<E> comparator) {
-        // TODO provide a recursive quickSort implementation,
-        //  that is different from the example given in the lecture
-
-
-
-        return items;   // replace as you find appropriate
+        if(items.size() < 2) {
+            return items;
+        }
+        return quickSortRecursive(items, 0, items.size() - 1, comparator);
     }
+    private List<E> quickSortRecursive(List<E> items, int start, int end, Comparator<E> comparator) {
+        if (start < end) {
+            int pivotIndex = partition(items, start, end, comparator);
+            quickSortRecursive(items, start, pivotIndex - 1, comparator);
+            quickSortRecursive(items, pivotIndex + 1, end, comparator);
+        }
+        return items;
+    }
+    private int partition(List<E> items, int start, int end, Comparator<E> comparator) {
+        E pivotValue = items.get(end);
+        int i = start - 1;
+
+        for (int j = start; j < end; j++) {
+            if (comparator.compare(items.get(j), pivotValue) <= 0) {
+                i++;
+                swap(items, i, j);
+            }
+        }
+        swap(items, i + 1, end);
+        return i + 1;
+    }
+    private void swap(List<E> items, int startIndex, int pivotIndex) {
+            E startElement = items.get(startIndex);
+            E pivotElement = items.get(pivotIndex);
+            items.set(startIndex, pivotElement);
+            items.set(pivotIndex, startElement);
+    }
+
+
+
+
+
 
     /**
      * Identifies the lead collection of numTops items according to the ordening criteria of comparator
