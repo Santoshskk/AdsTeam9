@@ -61,7 +61,12 @@ public class Song {
      * @return
      */
     public int getStreamsCountOfCountry(Country country) {
-        return streamsPerCountry.get(country);
+        if(streamsPerCountry.get(country) != null) {
+            return streamsPerCountry.get(country);
+        }
+        else {
+            return 0;
+        }
     }
     /**
      *
