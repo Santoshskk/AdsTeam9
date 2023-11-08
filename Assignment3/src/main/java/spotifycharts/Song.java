@@ -1,5 +1,8 @@
 package spotifycharts;
 
+import java.util.EnumMap;
+import java.util.Map;
+
 public class Song {
 
     public enum Language {
@@ -21,13 +24,15 @@ public class Song {
         IT  // Italy
     }
 
-    private final String artist;
+    private final String artist; //instance variable
     private final String title;
     private final Language language;
 
-    // TODO add instance variable(s) to track the streams counts per country
-    //  choose a data structure that you deem to be most appropriate for this application.
-
+    /*
+    I chose a Map because you can store key value pairs. the country enum can be used as the key and
+    an int will be the count of streams
+    */
+    private Map<Country, Integer> streamsPerCountry;
 
 
     /**
@@ -37,9 +42,7 @@ public class Song {
         this.artist = artist;
         this.title = title;
         this.language = language;
-
-        // TODO initialise streams counts per country as appropriate.
-
+        this.streamsPerCountry = new EnumMap<>(Country.class);
     }
 
     /**
@@ -49,7 +52,7 @@ public class Song {
      */
     public void setStreamsCountOfCountry(Country country, int streamsCount) {
         // TODO register the streams count for the given country.
-
+        streamsPerCountry.put(country, streamsCount);
     }
 
     /**
@@ -58,22 +61,21 @@ public class Song {
      * @return
      */
     public int getStreamsCountOfCountry(Country country) {
-        // TODO retrieve the streams count for the given country.
-
-
-        return 0; // replace by the proper amount
+        return streamsPerCountry.get(country);
     }
     /**
+     *
      * Calculates/retrieves the total of all streams counts across all countries from this song
      * @return
      */
     public int getStreamsCountTotal() {
-        // TODO calculate/get the total number of streams across all countries
 
-
-        return 0; // replace by the proper amount
+        int totalNumberOfStreams = 0;
+        for (int streamsCount : streamsPerCountry.values()) {
+            totalNumberOfStreams += streamsCount;
+        }
+        return totalNumberOfStreams;
     }
-
 
     /**
      * compares this song with the other song
@@ -84,7 +86,6 @@ public class Song {
     public int compareByHighestStreamsCountTotal(Song other) {
         // TODO compare the total of stream counts of this song across all countries
         //  with the total of the other song
-
 
         return 0;    // replace by proper result
     }
@@ -99,11 +100,8 @@ public class Song {
         // TODO compare this song with the other song
         //  ordening all Dutch songs upfront and then by decreasing total number of streams
 
-
-
         return 0;    // replace by proper result
     }
-
 
     public String getArtist() {
         return artist;
@@ -117,7 +115,8 @@ public class Song {
         return language;
     }
 
-    // TODO provide a toString implementation to format songs as in "artist/title{language}(total streamsCount)"
-
-
+    @Override
+    public String toString() {
+        return artist + "/" + title + "{" + language + "}" + "(" + getStreamsCountTotal() + ")";
+    }
 }
