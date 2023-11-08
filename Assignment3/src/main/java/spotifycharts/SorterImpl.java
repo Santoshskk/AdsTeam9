@@ -16,8 +16,11 @@ public class SorterImpl<E> implements Sorter<E> {
      * @return the items sorted in place
      */
 
-    //implemeted bubble sort
+    //implemented sorting algoritmes. first made bubble sort. also made selection sort for fun
     public List<E> selInsBubSort(List<E> items, Comparator<E> comparator) {
+       return bubbleSort(items, comparator);
+    }
+    private List<E> bubbleSort(List<E> items, Comparator<E> comparator) {
         boolean doItAgain = false;
         int limit = items.size();
         for (int i = 0; i < limit - 1; i++) {
@@ -33,6 +36,21 @@ public class SorterImpl<E> implements Sorter<E> {
         //recursively call the function to continue sorting
         if (doItAgain) {
             selInsBubSort(items, comparator);
+        }
+        return items;
+    }
+    private List<E> selectionSort(List<E> items, Comparator<E> comparator) {
+
+        for (int i = 0; i < items.size(); i++) {
+            int currentMinIndex = i;
+            for(int x = currentMinIndex + 1; x < items.size(); x++) {
+                if (comparator.compare(items.get(x), items.get(currentMinIndex)) < 0) {
+                    currentMinIndex = x;
+                }
+            }
+            if (currentMinIndex != i) {
+                swap(items, i, currentMinIndex);
+            }
         }
         return items;
     }
@@ -73,11 +91,11 @@ public class SorterImpl<E> implements Sorter<E> {
         swap(items, i + 1, end);
         return i + 1;
     }
-    private void swap(List<E> items, int startIndex, int pivotIndex) {
-            E startElement = items.get(startIndex);
-            E pivotElement = items.get(pivotIndex);
-            items.set(startIndex, pivotElement);
-            items.set(pivotIndex, startElement);
+    private void swap(List<E> items, int index1, int index2) {
+            E startElement = items.get(index1);
+            E pivotElement = items.get(index2);
+            items.set(index1, pivotElement);
+            items.set(index2, startElement);
     }
 
 
