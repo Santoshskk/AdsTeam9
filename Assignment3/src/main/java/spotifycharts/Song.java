@@ -84,10 +84,11 @@ public class Song {
      * @return  negative number, zero or positive number according to Comparator convention
      */
     public int compareByHighestStreamsCountTotal(Song other) {
-        // TODO compare the total of stream counts of this song across all countries
-        //  with the total of the other song
 
-        return 0;    // replace by proper result
+        int totalCurrentSong = this.getStreamsCountTotal();
+        int totalOtherSong = other.getStreamsCountTotal();
+        return Integer.compare(totalOtherSong, totalCurrentSong);
+
     }
 
     /**
@@ -97,11 +98,16 @@ public class Song {
      * @return  negative number, zero or positive number according to Comparator conventions
      */
     public int compareForDutchNationalChart(Song other) {
-        // TODO compare this song with the other song
-        //  ordening all Dutch songs upfront and then by decreasing total number of streams
-
-        return 0;    // replace by proper result
+        if (this.language == Language.NL && other.language != Language.NL) {
+            // This song is Dutch and should come before the other song
+            return -1;
+        } else if (this.language != Language.NL && other.language == Language.NL) {
+            // The other song is Dutch and should come before this song
+            return 1;
+        }
+        return Integer.compare(other.getStreamsCountTotal(), this.getStreamsCountTotal());
     }
+
 
     public String getArtist() {
         return artist;
