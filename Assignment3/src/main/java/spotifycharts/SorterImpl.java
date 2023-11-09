@@ -99,10 +99,6 @@ public class SorterImpl<E> implements Sorter<E> {
     }
 
 
-
-
-
-
     /**
      * Identifies the lead collection of numTops items according to the ordening criteria of comparator
      * and organizes and sorts this lead collection into the first numTops positions of the list
@@ -154,16 +150,13 @@ public class SorterImpl<E> implements Sorter<E> {
             // position 0 holds the root item of a heap of size i+1 organised by reverseComparator
             // this root item is the worst item of the remaining front part of the lead collection
 
-            // TODO swap item[0] and item[i];
-            //  this moves item[0] to its designated position
+            //swap item[0] and item[i];
+            //this moves item[0] to its designated position
+                swap(items, 0, i );
 
-
-
-            // TODO the new root may have violated the heap condition
-            //  repair the heap condition on the remaining heap of size i
-
-
-
+            //the new root may have violated the heap condition
+            // Repair the heap condition on the remaining heap of size i
+            heapSink(items, i, reverseComparator);
         }
 
         return items;
@@ -180,12 +173,26 @@ public class SorterImpl<E> implements Sorter<E> {
      * @param comparator
      */
     protected void heapSwim(List<E> items, int heapSize, Comparator<E> comparator) {
-        // TODO swim items[heapSize-1] up the heap until
-        //      i==0 || items[(i-1]/2] <= items[i]
+        int i = heapSize - 1;  // Start with the last item in the heap
+        E currentItem = items.get(i);
 
+        while (i > 0) {
+            int parentIndex = (i - 1) / 2;
 
+            // Check if the current item is greater than or equal to its parent
+            if (comparator.compare(currentItem, items.get(parentIndex)) >= 0) {
+                break;
+            }
 
+            // Swap the current item with its parent
+            items.set(i, items.get(parentIndex));
+            i = parentIndex;  // Move to the parent position
+        }
+
+        // Place the currentItem in its correct position in the heap
+        items.set(i, currentItem);
     }
+
     /**
      * Repairs the zero-based heap condition for its root items[0] on the basis of the comparator
      * all items[1..heapSize-1] are assumed to satisfy the heap condition
@@ -196,11 +203,56 @@ public class SorterImpl<E> implements Sorter<E> {
      * @param heapSize
      * @param comparator
      */
+        /*
+    Binary Min-Heap Zero-Based Indexes: value in ( ) are the indexes and the number before that the
+    value of the node
+
+                  1(0)
+                 /    \
+              2(1)    3(2)
+              /  \    /  \
+           5(3) 6(4) 7(5) 8(6)
+
+    Array: [1, 2, 3, 5, 6, 7, 8]
+
+    Index Calculations for 0-based index heap:
+    - Left child index  = 2 * parent_index + 1
+    - Right child index = 2 * parent_index + 2
+    - Parent index = (child_index - 1) / 2
+    */
+    /*
+    In a max heap, the value of each node is greater than or equal to the values of its children.
+    In a min heap, the value of each node is less than or equal to the values of its children.
+     */
+
     protected void heapSink(List<E> items, int heapSize, Comparator<E> comparator) {
-        // TODO sink items[0] down the heap until
-        //      2*i+1>=heapSize || (items[i] <= items[2*i+1] && items[i] <= items[2*i+2])
+        //sink items[0] down the heap until
+        //2*i+1>=heapSize || (items[i] <= items[2*i+1] && items[i] <= items[2*i+2])
 
+        int i = 0;
+        //2*i+1>=heapSize -- this condition
+        // checks if the left child of the current node exists within the bounds of the heap.
+        while (2 * i + 1 < heapSize) {
+            int leftChildIndex = 2 * i + 1;
+            int rightChildIndex = 2 * i + 2;
+            int smallerChildIndex = leftChildIndex;
 
+            // Compare the left child with the right child if it exists and is smaller
+            if (rightChildIndex < heapSize && comparator.compare(items.get(leftChildIndex), items.get(rightChildIndex)) > 0) {
+                smallerChildIndex = rightChildIndex;
+            }
 
+            // If the current item is smaller or equal to the smaller child, stop traverse the list
+            if (comparator.compare(items.get(i), items.get(smallerChildIndex)) <= 0) {
+                break;
+            }
+
+            // Swap the current item with the smaller child to create a new root
+            E temp = items.get(i);
+            items.set(i, items.get(smallerChildIndex));
+            items.set(smallerChildIndex, temp);
+
+            i = smallerChildIndex;
+        }
     }
 }
