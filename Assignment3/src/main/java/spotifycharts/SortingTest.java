@@ -2,6 +2,7 @@ package spotifycharts;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Comparator;
+import java.util.concurrent.TimeUnit;
 
 public class SortingTest{
 
@@ -19,7 +20,7 @@ public class SortingTest{
 
         for (int size : datasetSizes) {
             List<Song> songs = generateTestData(size);
-            performSortingTests(songs);
+            performSortingTests(songs, size);
         }
     }
     private static List<Song> generateTestData(int size) {
@@ -33,22 +34,22 @@ public class SortingTest{
 
         return songs;
     }
-    private static void performSortingTests(List<Song> originalSongs) {
+    private static void performSortingTests(List<Song> originalSongs, int size) {
         SorterImpl<Song> sorter = new SorterImpl<>();
         Comparator<Song> comparator = Comparator.comparing(Song::getTitle); // Adjust based on Song attributes
 
-        testSortingMethod("Bubble Sort", originalSongs, sorter, comparator);
-        testSortingMethod("Selection Sort", originalSongs, sorter, comparator);
-        testSortingMethod("Quick Sort", originalSongs, sorter, comparator);
-        testSortingMethod("Heap Sort", originalSongs, sorter, comparator, 10);
+        testSortingMethod("Bubble Sort", originalSongs, sorter, comparator, size);
+        testSortingMethod("Selection Sort", originalSongs, sorter, comparator, size);
+        testSortingMethod("Quick Sort", originalSongs, sorter, comparator, size);
+        testSortingMethod("Heap Sort", originalSongs, sorter, comparator, 10, size);
     }
-    private static void testSortingMethod(String methodName, List<Song> originalSongs, SorterImpl<Song> sorter, Comparator<Song> comparator) {
-        testSortingMethod(methodName, originalSongs, sorter, comparator, -1);
+    private static void testSortingMethod(String methodName, List<Song> originalSongs, SorterImpl<Song> sorter, Comparator<Song> comparator, int size) {
+        testSortingMethod(methodName, originalSongs, sorter, comparator, -1, size);
     }
-    private static void testSortingMethod(String methodName, List<Song> originalSongs, SorterImpl<Song> sorter, Comparator<Song> comparator, int numTops) {
+    private static void testSortingMethod(String methodName, List<Song> originalSongs, SorterImpl<Song> sorter, Comparator<Song> comparator, int numTops, int size) {
         List<Song> songsToSort = new ArrayList<>(originalSongs);
 
-        long startTime = System.currentTimeMillis();
+        long startTime = System.nanoTime();
 
         // Call the appropriate sorting method
         switch (methodName) {
@@ -70,7 +71,10 @@ public class SortingTest{
                 throw new IllegalArgumentException("Unknown sorting method: " + methodName);
         }
 
-        long endTime = System.currentTimeMillis();
-        System.out.println(methodName + " - Time taken for sorting: " + (endTime - startTime) + "ms");
+        long endTime = System.nanoTime();
+        long duration = endTime - startTime;
+
+        //long durationMillis = TimeUnit.NANOSECONDS.toMillis(duration);
+        System.out.println(methodName + " - Time taken for sorting: " + duration + " nano seconds" + "\ninput size " + size + "\n");
     }
 }

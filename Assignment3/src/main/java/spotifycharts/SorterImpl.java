@@ -238,8 +238,6 @@ public class SorterImpl<E> implements Sorter<E> {
      * @param comparator
      */
         /*
-
-
     Index Calculations for 0-based index heap:
     - Left child index  = 2 * parent_index + 1
     - Right child index = 2 * parent_index + 2
