@@ -39,7 +39,7 @@ public class SorterImpl<E> implements Sorter<E> {
         }
         return items;
     }
-    private List<E> selectionSort(List<E> items, Comparator<E> comparator) {
+    public List<E> selectionSort(List<E> items, Comparator<E> comparator) {
 
         for (int i = 0; i < items.size(); i++) {
             int currentMinIndex = i;
@@ -204,16 +204,7 @@ public class SorterImpl<E> implements Sorter<E> {
      * @param comparator
      */
         /*
-    Binary Min-Heap Zero-Based Indexes: value in ( ) are the indexes and the number before that the
-    value of the node
 
-                  1(0)
-                 /    \
-              2(1)    3(2)
-              /  \    /  \
-           5(3) 6(4) 7(5) 8(6)
-
-    Array: [1, 2, 3, 5, 6, 7, 8]
 
     Index Calculations for 0-based index heap:
     - Left child index  = 2 * parent_index + 1
@@ -225,6 +216,18 @@ public class SorterImpl<E> implements Sorter<E> {
     In a min heap, the value of each node is less than or equal to the values of its children.
      */
 
+    /*
+      Binary Min-Heap Zero-Based Indexes: value in ( ) are the indexes and the number before that the
+    value of the node
+
+                  1(0)
+                 /    \
+              2(1)    3(2)
+              /  \    /  \
+           5(3) 6(4) 7(5) 8(6)
+
+    Array: [1, 2, 3, 5, 6, 7, 8]
+     */
     protected void heapSink(List<E> items, int heapSize, Comparator<E> comparator) {
         //sink items[0] down the heap until
         //2*i+1>=heapSize || (items[i] <= items[2*i+1] && items[i] <= items[2*i+2])
