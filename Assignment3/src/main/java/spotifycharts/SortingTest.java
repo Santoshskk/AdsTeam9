@@ -16,7 +16,10 @@ public class SortingTest{
      */
 
     public static void main(String[] args) {
-        int[] datasetSizes = {100, 200, 400, 800, 1600};
+        //if I make the input > 12800. 25600 for example. it takes around 28 secondds to sort.
+        // so that is why I limited it till 12800
+        int[] datasetSizes = {100, 200, 400, 800, 1600, 3200, 6400, 12800 };
+
 
         for (int size : datasetSizes) {
             List<Song> songs = generateTestData(size);
@@ -72,9 +75,14 @@ public class SortingTest{
         }
 
         long endTime = System.nanoTime();
-        long duration = endTime - startTime;
+        long durationNanoSeconds = endTime - startTime;
+        long durationMillis = TimeUnit.NANOSECONDS.toMillis(durationNanoSeconds);
+        long durationSeconds = durationNanoSeconds / 1_000_000_000;
 
-        //long durationMillis = TimeUnit.NANOSECONDS.toMillis(duration);
-        System.out.println(methodName + " - Time taken for sorting: " + duration + " nano seconds" + "\ninput size " + size + "\n");
+        System.out.println(methodName + "\n - Time taken for sorting:" +
+                " \n Nano Seconds: " + durationNanoSeconds + " nano seconds" +
+                " \n Mili seconds: " + durationMillis + " milli seconds" +
+                " \nSeconds: " + durationSeconds + " secondds" +
+                "\ninput size: " + size + "\n");
     }
 }

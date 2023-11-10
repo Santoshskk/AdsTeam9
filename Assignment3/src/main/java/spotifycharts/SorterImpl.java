@@ -33,24 +33,23 @@ public class SorterImpl<E> implements Sorter<E> {
      * @return
      */
     private List<E> bubbleSort(List<E> items, Comparator<E> comparator) {
-        boolean doItAgain = false;
-        int limit = items.size();
-        for (int i = 0; i < limit - 1; i++) {
-            E thisValue = items.get(i);
-            E nextValue = items.get(i + 1);
-            if (comparator.compare(thisValue, nextValue) > 0) {
-                // Swap elements
-                items.set(i, nextValue);
-                items.set(i + 1, thisValue);
-                doItAgain = true; // A swap occurred so check again
+        boolean swapped;
+        do {
+            swapped = false;
+            for (int i = 0; i < items.size() - 1; i++) {
+                E thisValue = items.get(i);
+                E nextValue = items.get(i + 1);
+                if (comparator.compare(thisValue, nextValue) > 0) {
+                    // Swap elements
+                    items.set(i, nextValue);
+                    items.set(i + 1, thisValue);
+                    swapped = true; // A swap occurred
+                }
             }
-        }
-        //recursively call the function to continue sorting
-        if (doItAgain) {
-            selInsBubSort(items, comparator);
-        }
+        } while (swapped); // Continue until no more swaps are needed
         return items;
     }
+
 
 
     /**
