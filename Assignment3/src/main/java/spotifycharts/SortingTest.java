@@ -1,55 +1,107 @@
+/**
+ * The `SortingTest` class is responsible for evaluating the efficiency of various sorting algorithms
+ * by measuring their execution times on datasets of songs of different sizes.
+ *
+ * It generates test data sets, applies sorting algorithms (Bubble Sort, Selection Sort, Quick Sort, and Heap Sort)
+ * to these datasets, measures the execution times, and provides an analysis of their efficiency.
+ *
+ * To ensure accurate assessments, the class provides flexibility through the `numberOfRuns` variable:
+ * - When `numberOfRuns` is set to 1, each sorting algorithm is executed once for the given input size.
+ *   Execution times are reported in nanoseconds, milliseconds, and seconds for a single run.
+ * - When `numberOfRuns` is > then 1 for example set to 10, each sorting algorithm is executed multiple times (e.g., ten times)
+ *   for the same input size. The program calculates and reports the average execution time over these runs at the end in nanoseconds.
+ *
+ * Example: (run this in main) - SpotifyChartsMain
+ * To run each sorting algorithm ten times for the same input size and calculate the average execution time:
+ * ```java
+ * SortingTest sortingTest = new SortingTest();
+ * sortingTest.setNumberOfRuns(10); // Set the number of runs to 10
+ * sortingTest.runTests(); // Perform sorting algorithm tests and report averages
+ * ```
+ *
+ *
+ * Note: The input size is capped at 25600 due to constraints specified in the assignment (20 seconds max sorting time).
+ *
+ * @author Tygo
+ * @version 1.0
+ */
+
 package spotifycharts;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Comparator;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public class SortingTest{
 
-    /**
-     *
-     this class includes methods for generating test data sets of varying sizes and testing different sorting algorithms
-     (Bubble Sort, Selection Sort, Quick Sort, and Heap Sort)
-     The class measures and outputs the execution time for each sorting algorithm,
-     aiding in the analysis of their efficiency.
-     System.gc() is called post data generation to minimize GC (garbage collection) impact on timing measurements
-     */
+public class SortingTest {
+    private int numberOfRuns = 1;
 
-    public static void main(String[] args) {
-        //if I make the input > 12800. 25600 for example. it takes around 28 secondds to sort.
-        // so that is why I limited it till 12800
-        int[] datasetSizes = {100, 200, 400, 800, 1600, 3200, 6400, 12800 };
+    public void runTests() {
+        int[] datasetSizes = {100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600};
+
+
+        Map<Integer, Map<String, Long>> allAverageTimes = new LinkedHashMap<>();
+
+        /**
+         * This class includes methods for generating test data sets of varying sizes and testing different sorting algorithms
+         * (Bubble Sort, Selection Sort, Quick Sort, and Heap Sort).
+         * The class measures and outputs the execution time for each sorting algorithm,
+         * aiding in the analysis of their efficiency.
+         * System.gc() is called post data generation to minimize GC (garbage collection) impact on timing measurements.
+         */
 
 
         for (int size : datasetSizes) {
-            List<Song> songs = generateTestData(size);
-            performSortingTests(songs, size);
+            List<Song> songs = generateTestData(size, 20060423L);
+            Map<String, Long> averageTimes = performSortingTests(songs, size, this.getNumberOfRuns());
+            allAverageTimes.put(size, averageTimes);
+        }
+
+
+        if(numberOfRuns > 1) {
+            // Output the average durations at the end, organized by input size
+            for (Map.Entry<Integer, Map<String, Long>> sizeEntry : allAverageTimes.entrySet()) {
+                System.out.println("Input size: " + sizeEntry.getKey());
+                for (Map.Entry<String, Long> methodEntry : sizeEntry.getValue().entrySet()) {
+                    System.out.println(methodEntry.getKey() + " - Average Time taken over 10 runs: " + methodEntry.getValue() + " nano seconds");
+                }
+                System.out.println();
+
+            }
         }
     }
-    private static List<Song> generateTestData(int size) {
-        List<Song> songs = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            songs.add(SongBuilder.createSample(i)); // Adjust this to your song creation method
-        }
 
-        // call to the JVM to perform garbage collection
-        System.gc();
-
+    private static List<Song> generateTestData(int size, long seed) {
+        ChartsCalculator chartsCalculator = new ChartsCalculator(seed);
+        List<Song> songs = chartsCalculator.registerStreamedSongs(size);
+        System.gc(); // Call to the JVM to perform garbage collection
         return songs;
     }
-    private static void performSortingTests(List<Song> originalSongs, int size) {
-        SorterImpl<Song> sorter = new SorterImpl<>();
-        Comparator<Song> comparator = Comparator.comparing(Song::getTitle); // Adjust based on Song attributes
 
-        testSortingMethod("Bubble Sort", originalSongs, sorter, comparator, size);
-        testSortingMethod("Selection Sort", originalSongs, sorter, comparator, size);
-        testSortingMethod("Quick Sort", originalSongs, sorter, comparator, size);
-        testSortingMethod("Heap Sort", originalSongs, sorter, comparator, 10, size);
+    private static Map<String, Long> performSortingTests(List<Song> originalSongs, int size, int numberOfRuns) {
+        SorterImpl<Song> sorter = new SorterImpl<>();
+        Comparator<Song> comparator = Comparator.comparing(Song::getTitle);
+
+        Map<String, Long> averageTimes = new LinkedHashMap<>();
+
+        if (numberOfRuns > 1) {
+            averageTimes.put("Bubble Sort", testSortingMethodRepeatedly("Bubble Sort", sorter, comparator, size, numberOfRuns));
+            averageTimes.put("Selection Sort", testSortingMethodRepeatedly("Selection Sort", sorter, comparator, size, numberOfRuns));
+            averageTimes.put("Quick Sort", testSortingMethodRepeatedly("Quick Sort", sorter, comparator, size, numberOfRuns));
+            averageTimes.put("Heap Sort", testSortingMethodRepeatedly("Heap Sort", sorter, comparator, size, 10));
+        } else {
+            testSortingMethod("Bubble Sort", originalSongs, sorter, comparator, size);
+            testSortingMethod("Selection Sort", originalSongs, sorter, comparator, size);
+            testSortingMethod("Quick Sort", originalSongs, sorter, comparator, size);
+            testSortingMethod("Heap Sort", originalSongs, sorter, comparator, 10, size);
+        }
+
+        return averageTimes;
     }
-    private static void testSortingMethod(String methodName, List<Song> originalSongs, SorterImpl<Song> sorter, Comparator<Song> comparator, int size) {
-        testSortingMethod(methodName, originalSongs, sorter, comparator, -1, size);
+
+    private static long testSortingMethod(String methodName, List<Song> originalSongs, SorterImpl<Song> sorter, Comparator<Song> comparator, int size) {
+        return testSortingMethod(methodName, originalSongs, sorter, comparator, -1, size);
     }
-    private static void testSortingMethod(String methodName, List<Song> originalSongs, SorterImpl<Song> sorter, Comparator<Song> comparator, int numTops, int size) {
+
+    private static long testSortingMethod(String methodName, List<Song> originalSongs, SorterImpl<Song> sorter, Comparator<Song> comparator, int numTops, int size) {
         List<Song> songsToSort = new ArrayList<>(originalSongs);
 
         long startTime = System.nanoTime();
@@ -76,13 +128,36 @@ public class SortingTest{
 
         long endTime = System.nanoTime();
         long durationNanoSeconds = endTime - startTime;
-        long durationMillis = TimeUnit.NANOSECONDS.toMillis(durationNanoSeconds);
-        long durationSeconds = durationNanoSeconds / 1_000_000_000;
 
+        // Output the duration for this single run
         System.out.println(methodName + "\n - Time taken for sorting:" +
-                " \n Nano Seconds: " + durationNanoSeconds + " nano seconds" +
-                " \n Mili seconds: " + durationMillis + " milli seconds" +
-                " \nSeconds: " + durationSeconds + " secondds" +
+                " \nNano Seconds: " + durationNanoSeconds + " nano seconds" +
+                " \nMili seconds: " + TimeUnit.NANOSECONDS.toMillis(durationNanoSeconds) + " milli seconds" +
+                " \nSeconds: " + durationNanoSeconds / 1_000_000_000 + " seconds" +
                 "\ninput size: " + size + "\n");
+
+        return durationNanoSeconds;
+    }
+
+    private static long testSortingMethodRepeatedly(String methodName, SorterImpl<Song> sorter, Comparator<Song> comparator, int size, int numberOfRuns) {
+        return testSortingMethodRepeatedly(methodName, sorter, comparator, size, -1, numberOfRuns);
+    }
+
+    private static long testSortingMethodRepeatedly(String methodName, SorterImpl<Song> sorter, Comparator<Song> comparator, int size, int numTops, int numberOfRuns) {
+        long totalDurationNanoSeconds = 0;
+        for (int i = 0; i < numberOfRuns; i++) {
+            long seed = new Random().nextLong(); // Use long for seed
+            List<Song> songs = generateTestData(size, seed);
+            totalDurationNanoSeconds += testSortingMethod(methodName, songs, sorter, comparator, numTops, size);
+        }
+        return totalDurationNanoSeconds / numberOfRuns;
+    }
+
+    public void setNumberOfRuns(int numberOfRuns) {
+        this.numberOfRuns = numberOfRuns;
+    }
+
+    public int getNumberOfRuns() {
+        return numberOfRuns;
     }
 }
