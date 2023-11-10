@@ -20,6 +20,18 @@ public class SorterImpl<E> implements Sorter<E> {
     public List<E> selInsBubSort(List<E> items, Comparator<E> comparator) {
        return bubbleSort(items, comparator);
     }
+
+
+    /**
+     * Bubble sort
+     * Worst-case complexity: O(n²)
+     * best case complexity: O(n) this is when the list is already sorted
+     * this algoritme compares each pair of items and swaps when in the wrong order.
+     *
+     * @param items
+     * @param comparator
+     * @return
+     */
     private List<E> bubbleSort(List<E> items, Comparator<E> comparator) {
         boolean doItAgain = false;
         int limit = items.size();
@@ -39,6 +51,20 @@ public class SorterImpl<E> implements Sorter<E> {
         }
         return items;
     }
+
+
+    /**
+     * Worst case complexity: O(n²)
+     * Best case complexity: O(n²)
+     *
+     * this Algoritme looks for the smallest item in the list and places it at the start.
+     * This process is repeated for the remainder of the list
+     *
+     * so it is O(N x N) which is OO(n²)
+     * @param items
+     * @param comparator
+     * @return
+     */
     public List<E> selectionSort(List<E> items, Comparator<E> comparator) {
 
         for (int i = 0; i < items.size(); i++) {
@@ -59,6 +85,12 @@ public class SorterImpl<E> implements Sorter<E> {
      * Sorts all items by quick sort using the provided comparator
      * for deciding relative ordening of two items
      * Items are sorted 'in place' without use of an auxiliary list or array
+     *
+     * Worst-Case Complexity: O(n²)
+     * Best-Case complexity:  O(n log n)
+     * The Big O complexity of Quick Sort varies based on the choice of the pivot.
+     * There is no fixed level of complexity for QuickSort
+     *
      * @param items
      * @param comparator
      * @return  the items sorted in place
@@ -81,7 +113,6 @@ public class SorterImpl<E> implements Sorter<E> {
     private int partition(List<E> items, int start, int end, Comparator<E> comparator) {
         E pivotValue = items.get(end);
         int i = start - 1;
-
         for (int j = start; j < end; j++) {
             if (comparator.compare(items.get(j), pivotValue) <= 0) {
                 i++;
@@ -98,7 +129,6 @@ public class SorterImpl<E> implements Sorter<E> {
             items.set(index2, startElement);
     }
 
-
     /**
      * Identifies the lead collection of numTops items according to the ordening criteria of comparator
      * and organizes and sorts this lead collection into the first numTops positions of the list
@@ -110,6 +140,10 @@ public class SorterImpl<E> implements Sorter<E> {
      * @param comparator
      * @return              the items list with its first numTops items sorted according to comparator
      *                      all other items >= any item in the lead collection
+     *
+     *
+     *
+     *  Complexity: O(n log m)
      */
     public List<E> topsHeapSort(int numTops, List<E> items, Comparator<E> comparator) {
 
