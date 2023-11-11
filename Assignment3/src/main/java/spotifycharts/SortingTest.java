@@ -35,6 +35,11 @@ public class SortingTest {
     private Map<String, Long> averageTimes;
     private static Map<Integer, Map<String, Long>> executionTimes = new LinkedHashMap<>(); // Store execution times for each size and method
 
+
+    /**
+     * Executes the sorting tests for all predefined dataset sizes.
+     * This method iterates over a set of input sizes and performs sorting tests for each size.
+     */
     public void runTests() {
         int[] datasetSizes = {100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600};
 
@@ -67,6 +72,13 @@ public class SortingTest {
         }
     }
 
+    /**
+     * Generates test data for sorting.
+     *
+     * @param size The size of the dataset to generate.
+     * @param seed The seed for random data generation.
+     * @return A list of {@code Song} objects for testing.
+     */
     private static List<Song> generateTestData(int size, long seed) {
         ChartsCalculator chartsCalculator = new ChartsCalculator(seed);
         List<Song> songs = chartsCalculator.registerStreamedSongs(size);
@@ -74,6 +86,14 @@ public class SortingTest {
         return songs;
     }
 
+    /**
+     * Performs sorting tests on a list of songs and returns the execution times.
+     *
+     * @param originalSongs The list of songs to be sorted.
+     * @param size The size of the dataset.
+     * @param numberOfRuns The number of runs for each sorting algorithm.
+     * @return A map of sorting algorithm names to their execution times.
+     */
     private static Map<String, Long> performSortingTests(List<Song> originalSongs, int size, int numberOfRuns) {
         SorterImpl<Song> sorter = new SorterImpl<>();
         Comparator<Song> comparator = Comparator.comparing(Song::getTitle);
@@ -95,6 +115,16 @@ public class SortingTest {
         return averageTimes;
     }
 
+    /**
+     * Tests a single sorting method for a given list of songs.
+     *
+     * @param methodName The name of the sorting method to test.
+     * @param originalSongs The list of songs to sort.
+     * @param sorter The sorting implementation.
+     * @param comparator The comparator used for sorting.
+     * @param size The size of the dataset.
+     * @return The execution time in nanoseconds for the sorting method.
+     */
     private static long testSortingMethod(String methodName, List<Song> originalSongs, SorterImpl<Song> sorter, Comparator<Song> comparator, int size) {
         return testSortingMethod(methodName, originalSongs, sorter, comparator, -1, size);
     }
@@ -140,6 +170,16 @@ public class SortingTest {
         return durationNanoSeconds;
     }
 
+    /**
+     * Tests a single sorting method repeatedly for a given list of songs.
+     *
+     * @param methodName The name of the sorting method to test.
+     * @param sorter The sorting implementation.
+     * @param comparator The comparator used for sorting.
+     * @param size The size of the dataset.
+     * @param numberOfRuns The number of times to repeat the test.
+     * @return The average execution time in nanoseconds for the sorting method.
+     */
     private static long testSortingMethodRepeatedly(String methodName, SorterImpl<Song> sorter, Comparator<Song> comparator, int size, int numberOfRuns) {
         return testSortingMethodRepeatedly(methodName, sorter, comparator, size, -1, numberOfRuns);
     }
@@ -153,6 +193,7 @@ public class SortingTest {
         }
         return totalDurationNanoSeconds / numberOfRuns;
     }
+
 
     public void setNumberOfRuns(int numberOfRuns) {
         this.numberOfRuns = numberOfRuns;
