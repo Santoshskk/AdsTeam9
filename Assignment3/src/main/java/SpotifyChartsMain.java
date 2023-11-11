@@ -9,11 +9,10 @@ public class SpotifyChartsMain {
         chartsCalculator.registerStreamedSongs(263);
         chartsCalculator.showResults();
 
-        //run this to run the sortingTest. to test performance of all the sorting
-
+        //uncomment this to run the sortingTest. to test performance of all the sorting
 
 //        SortingTest sortingTest1 = new SortingTest();
-//        sortingTest1.setNumberOfRuns(2);
+//        sortingTest1.setNumberOfRuns(10);
 //        sortingTest1.runTests();
 
     }

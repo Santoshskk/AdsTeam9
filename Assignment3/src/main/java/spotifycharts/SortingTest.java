@@ -30,24 +30,13 @@ package spotifycharts;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-
 public class SortingTest {
     private int numberOfRuns = 1;
 
     public void runTests() {
         int[] datasetSizes = {100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600};
 
-
         Map<Integer, Map<String, Long>> allAverageTimes = new LinkedHashMap<>();
-
-        /**
-         * This class includes methods for generating test data sets of varying sizes and testing different sorting algorithms
-         * (Bubble Sort, Selection Sort, Quick Sort, and Heap Sort).
-         * The class measures and outputs the execution time for each sorting algorithm,
-         * aiding in the analysis of their efficiency.
-         * System.gc() is called post data generation to minimize GC (garbage collection) impact on timing measurements.
-         */
-
 
         for (int size : datasetSizes) {
             List<Song> songs = generateTestData(size, 20060423L);
@@ -55,16 +44,23 @@ public class SortingTest {
             allAverageTimes.put(size, averageTimes);
         }
 
-
-        if(numberOfRuns > 1) {
+        if (numberOfRuns > 1) {
+            System.out.println("Sorting done! all Averages below --- \n ");
             // Output the average durations at the end, organized by input size
             for (Map.Entry<Integer, Map<String, Long>> sizeEntry : allAverageTimes.entrySet()) {
-                System.out.println("Input size: " + sizeEntry.getKey());
+                System.out.println("input size: " + sizeEntry.getKey() + " items");
                 for (Map.Entry<String, Long> methodEntry : sizeEntry.getValue().entrySet()) {
-                    System.out.println(methodEntry.getKey() + " - Average Time taken over 10 runs: " + methodEntry.getValue() + " nano seconds");
+                    long averageTimeNano = methodEntry.getValue();
+                    long averageTimeMillis = TimeUnit.NANOSECONDS.toMillis(averageTimeNano);
+                    double averageTimeSeconds = averageTimeNano / 1_000_000_000.0;
+
+                    System.out.println(methodEntry.getKey() + " - Average Time taken over 10 runs:\n" +
+                            "nano seconds: " + averageTimeNano + "\n" +
+                            "milli seconds: " + averageTimeMillis + "\n" +
+                            "seconds: " + averageTimeSeconds + "\n");
+
                 }
                 System.out.println();
-
             }
         }
     }
@@ -130,11 +126,11 @@ public class SortingTest {
         long durationNanoSeconds = endTime - startTime;
 
         // Output the duration for this single run
-        System.out.println(methodName + "\n - Time taken for sorting:" +
+        System.out.println(methodName + "\nTime taken for sorting:" +
                 " \nNano Seconds: " + durationNanoSeconds + " nano seconds" +
                 " \nMili seconds: " + TimeUnit.NANOSECONDS.toMillis(durationNanoSeconds) + " milli seconds" +
                 " \nSeconds: " + durationNanoSeconds / 1_000_000_000 + " seconds" +
-                "\ninput size: " + size + "\n");
+                "\ninput size: " + size + " items\n");
 
         return durationNanoSeconds;
     }
