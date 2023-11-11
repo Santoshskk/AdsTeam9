@@ -32,6 +32,8 @@ import java.util.concurrent.TimeUnit;
 
 public class SortingTest {
     private int numberOfRuns = 1;
+    private Map<String, Long> averageTimes;
+    private static Map<Integer, Map<String, Long>> executionTimes = new LinkedHashMap<>(); // Store execution times for each size and method
 
     public void runTests() {
         int[] datasetSizes = {100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600};
@@ -40,7 +42,7 @@ public class SortingTest {
 
         for (int size : datasetSizes) {
             List<Song> songs = generateTestData(size, 20060423L);
-            Map<String, Long> averageTimes = performSortingTests(songs, size, this.getNumberOfRuns());
+            averageTimes = performSortingTests(songs, size, this.getNumberOfRuns());
             allAverageTimes.put(size, averageTimes);
         }
 
@@ -124,6 +126,7 @@ public class SortingTest {
 
         long endTime = System.nanoTime();
         long durationNanoSeconds = endTime - startTime;
+        executionTimes.computeIfAbsent(size, k -> new LinkedHashMap<>()).put(methodName, durationNanoSeconds);
 
         // Output the duration for this single run
         System.out.println(methodName + "\nTime taken for sorting:" +
@@ -131,6 +134,8 @@ public class SortingTest {
                 " \nMili seconds: " + TimeUnit.NANOSECONDS.toMillis(durationNanoSeconds) + " milli seconds" +
                 " \nSeconds: " + durationNanoSeconds / 1_000_000_000 + " seconds" +
                 "\ninput size: " + size + " items\n");
+
+
 
         return durationNanoSeconds;
     }
@@ -155,5 +160,13 @@ public class SortingTest {
 
     public int getNumberOfRuns() {
         return numberOfRuns;
+    }
+
+    public Map<String, Long> getAverageTimes() {
+        return averageTimes;
+    }
+
+    public Map<Integer, Map<String, Long>> getExecutionTimes() {
+        return executionTimes;
     }
 }
