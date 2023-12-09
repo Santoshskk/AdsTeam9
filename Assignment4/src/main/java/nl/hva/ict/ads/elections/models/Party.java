@@ -31,33 +31,28 @@ public class Party {
         this.name = name;
 
         // TODO initialise this.candidates with an appropriate Set implementation
-
+        this.candidates = new HashSet<>();
 
     }
 
-    /**
-     * Adds a newCandidate to the set of candidates in the party
-     * If a candidate with the same name already had been registered in the party earlier,
-     * then this duplicate instance shall be retrieved from the set and returned for further use
-     * thereby avoiding the memory footprint of continued use of all duplicate instances of candidates
-     * as they are imported from XML
-     * @param newCandidate
-     * @return  the existing duplicate instance of newCandidate if available,
-     *              or otherwise the newCandidate itself
-     */
     public Candidate addOrGetCandidate(Candidate newCandidate) {
+        if (newCandidate != null) {
+            newCandidate.setParty(this);
+            // Check for duplicates with help from the equal method from the candidate class
+            for (Candidate existingCandidate : candidates) {
+                if (existingCandidate.equals(newCandidate)) {
+                    // If a candidate exists, return the existing duplicate instance in the original candidates set
+                    return existingCandidate;
+                }
+            }
+            // If no existing candidate is found. add the newCandidate to the set
+            candidates.add(newCandidate);
+        }
 
-        // associate the new Candidate with this party
-        newCandidate.setParty(this);
-
-        // TODO try to add the newCandidate to the set of candidates,
-        //  and if that fails then return the existing duplicate instance that is in the set already.
-
-
-
-
-        return null; // replace by a proper outcome
+        return newCandidate;
     }
+
+
 
     @Override
     public String toString() {
@@ -73,20 +68,14 @@ public class Party {
         if (!(o instanceof Party)) return false;
         Party other = (Party) o;
 
-        // TODO provide the equality criterion to identify unique party instances
-
-
-
-        return false; // replace by a proper outcome
+        // Compare parties based on their unique ID
+        return this.id == other.id;
     }
 
     @Override
     public int hashCode() {
-        // TODO provide a hashCode that is consistent with above equality criterion
-
-
-
-        return 0; // replace by a proper outcome
+        //party ID as the hash code
+        return Objects.hash(id);
     }
 
     public int getId() {

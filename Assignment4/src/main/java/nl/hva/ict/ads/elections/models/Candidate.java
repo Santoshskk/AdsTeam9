@@ -85,28 +85,10 @@ public class Candidate {
         return sameName && sameParty;
     }
 
-
-
     @Override
     public int hashCode() {
-        int result = 0;
-
-        // Calculate the hash code for the party ID
-        result = 31 * result + getParty().getId();
-
-        // Calculate the hash code for the candidate name
-        if (getFullName() != null) {
-            result = 31 * result + getFullName().hashCode();
-        }
-
-        return result;
+        return Objects.hash(getParty().getId(), getFullName());
     }
-
-
-
-
-
-
 
     public String getFirstName() {
         return firstName;
