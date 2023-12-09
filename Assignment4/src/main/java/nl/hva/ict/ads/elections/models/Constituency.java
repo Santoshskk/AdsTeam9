@@ -100,14 +100,15 @@ public class Constituency {
      * @param party
      * @return
      */
-    public final List<Candidate> getCandidates(Party party) {
-        // TODO: return a list with all registered candidates of a given party in order of their rank
-        //  hint: if the implementation classes of rankedCandidatesByParty are well chosen, this only takes one line of code
-        //  hint: the resulting list may be immutable at your choice of implementation.
+    public List<Candidate> getCandidates(Party party) {
+        NavigableMap<Integer, Candidate> candidatesByRank = rankedCandidatesByParty.get(party);
 
-
-        return null; // replace by a proper outcome
+        if (candidatesByRank == null) {
+            return Collections.emptyList();
+        }
+        return new ArrayList<>(candidatesByRank.values());
     }
+
 
     /**
      * finds all candidates who are electable in this Constituency
@@ -115,12 +116,12 @@ public class Constituency {
      * @return the set of all candidates in this Constituency.
      */
     public Set<Candidate> getAllCandidates() {
-        // TODO collect all candidates of all parties of this Constituency into a Set.
-        //  hint: flatMap may help...
-
-
-        return null;    // replace by a proper outcome
+        return rankedCandidatesByParty.values()
+                .stream()
+                .flatMap(candidateMap -> candidateMap.values().stream())
+                .collect(Collectors.toSet());
     }
+
 
     /**
      * Retrieve the sub set of polling stations that are located within the area of the specified zip codes
@@ -128,27 +129,36 @@ public class Constituency {
      * All valid zip codes adhere to the pattern 'nnnnXX' with 1000 <= nnnn <= 9999 and 'AA' <= XX <= 'ZZ'
      * @param firstZipCode
      * @param lastZipCode
-     * @return      the sub set of polling stations within the specified zipCode range
+     * @return the sub set of polling stations within the specified zipCode range
      */
     public NavigableSet<PollingStation> getPollingStationsByZipCodeRange(String firstZipCode, String lastZipCode) {
-        // TODO: return all polling stations that have been registered at this constituency
-        //  hint: there is no need to build a new collection; just return what you have got...
-
-
-        return null; // replace by a proper outcome
+        return pollingStations.subSet(
+                new PollingStation("", firstZipCode, ""),
+                true,
+                new PollingStation("", lastZipCode, ""),
+                true
+        );
     }
+
 
     /**
      * Provides a map of total number of votes per party in this constituency
      * accumulated across all polling stations and all candidates
      * @return
      */
-    public Map<Party,Integer> getVotesByParty() {
-        // TODO prepare a map of total number of votes per party
-
-
-        return null; // replace by a proper outcome
+    public Map<Party, Integer> getVotesByParty() {
+        Map<Party, Integer> votesByParty = new HashMap<>();
+        for (PollingStation pollingStation : pollingStations) {
+            for (Map.Entry<Candidate, Integer> entry : pollingStation.getVotesByCandidate().entrySet()) {
+                Candidate candidate = entry.getKey();
+                int votes = entry.getValue();
+                Party party = candidate.getParty();
+                votesByParty.put(party, votesByParty.getOrDefault(party, 0) + votes);
+            }
+        }
+        return votesByParty;
     }
+
 
     /**
      * adds a polling station to this constituency
