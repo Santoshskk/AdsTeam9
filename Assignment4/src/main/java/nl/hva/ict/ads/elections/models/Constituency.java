@@ -38,11 +38,11 @@ public class Constituency {
         this.id = id;
         this.name = name;
 
-        // TODO initialise this.rankedCandidatesByParty with an appropriate Map implementation
-        //  and this.pollingStations with an appropriate Set implementation organised by zipCode and Id
-
-
+        this.rankedCandidatesByParty = new HashMap<>();
+        //TreeSet automatically maintains ordering
+        this.pollingStations = new TreeSet<>(Comparator.comparing(PollingStation::getZipCode).thenComparing(PollingStation::getId));
     }
+
 
     /**
      * registers a candidate for participation in the election for his/her party in this constituency.
@@ -54,25 +54,30 @@ public class Constituency {
      * @return whether the registration has succeeded
      */
     public boolean register(int rank, Candidate candidate) {
-        // TODO  register the candidate in this constituency for his/her party at the given rank (ballot position)
-        //  hint1: first check if a map of registered candidates already exist for the party of the given candidate
-        //        then add the candidate to that map, if the candidate has not been registered before.
-
-        return false;    // replace by a proper outcome
+        // Check if the candidate is already registered in this constituency
+        NavigableMap<Integer, Candidate> candidatesByRank = rankedCandidatesByParty.computeIfAbsent(candidate.getParty(), k -> new TreeMap<>());
+        // Check if the rank is already taken by another candidate
+        if (candidatesByRank.containsKey(rank)) {
+            return false; //the rank is already occupied.
+        }
+        // Check if the candidate has been registered already at another rank
+        if (candidatesByRank.containsValue(candidate)) {
+            return false; //the candidate is already registered at a different rank.
+        }
+        // Register the candidate at the  rank
+        candidatesByRank.put(rank, candidate);
+        return true;
     }
+
 
     /**
      * retrieves the collection of parties that have registered one or more candidates at this constituency
      * @return
      */
     public Collection<Party> getParties() {
-        // TODO: return all parties that have been registered at this constituency
-        //  hint: there is no need to build a new collection; just return what you have got...
-
-
-
-        return null;    // replace by a proper outcome
+        return rankedCandidatesByParty.keySet();
     }
+
 
     /**
      * retrieves a candidate from the ballot list of given party and at given rank
@@ -81,11 +86,14 @@ public class Constituency {
      * @return
      */
     public Candidate getCandidate(Party party, int rank) {
-        // TODO: return the candidate at the given rank in the given party
-
-
-        return null;    // replace by a proper outcome
+        // Check if the party is registered in this constituency
+        NavigableMap<Integer, Candidate> candidatesByRank = rankedCandidatesByParty.get(party);
+        if (candidatesByRank != null) {
+            return candidatesByRank.get(rank);
+        }
+        return null;
     }
+
 
     /**
      * retrieve a list of all registered candidates for a given party in order of their rank
