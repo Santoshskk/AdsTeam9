@@ -38,16 +38,23 @@ public class Candidate {
      * @return
      */
     public static String fullName(String firstName, String lastNamePrefix, String lastName) {
-        // every candidate shall have a last name
-        String fullName = lastName;
+        StringBuilder fullNameBuilder = new StringBuilder();
 
-        // TODO prepend optional lastNamePrefix and optional firstName
-        //  to compose a unique and nicely formatted full name
+        //if firstname or lastnameprefix is not null or empty it is added to the string with a space
+        if (firstName != null && !firstName.isEmpty()) {
 
+            fullNameBuilder.append(firstName).append(" ");
+        }
 
+        if (lastNamePrefix != null && !lastNamePrefix.isEmpty()) {
+            fullNameBuilder.append(lastNamePrefix).append(" ");
+        }
 
-        return fullName;
+        fullNameBuilder.append(lastName);
+
+        return fullNameBuilder.toString().trim();
     }
+
 
     public String getFullName() {
         return fullName(this.firstName, this.lastNamePrefix, this.lastName);
@@ -67,20 +74,39 @@ public class Candidate {
         if (!(o instanceof Candidate)) return false;
         Candidate other = (Candidate) o;
 
-        // TODO provide the equality criterion to identify unique candidate instances
-        //  hint: every candidate shall have a unique full name within his/her party.
+        // Check if the full names are equal (ignoring case)
+        boolean sameName = this.getFullName() != null && other.getFullName() != null
+                && this.getFullName().equalsIgnoreCase(other.getFullName());
 
+        // Check if the party IDs are equal
+        boolean sameParty = this.getParty() != null && other.getParty() != null
+                && this.getParty().getId() == other.getParty().getId();
 
-        return false; // replace by a proper outcome
+        return sameName && sameParty;
     }
+
+
 
     @Override
     public int hashCode() {
-        // TODO provide a hashCode that is consistent with above equality criterion
+        int result = 0;
 
+        // Calculate the hash code for the party ID
+        result = 31 * result + getParty().getId();
 
-        return 0; // replace by a proper outcome
+        // Calculate the hash code for the candidate name
+        if (getFullName() != null) {
+            result = 31 * result + getFullName().hashCode();
+        }
+
+        return result;
     }
+
+
+
+
+
+
 
     public String getFirstName() {
         return firstName;
