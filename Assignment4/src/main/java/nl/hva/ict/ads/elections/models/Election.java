@@ -29,10 +29,8 @@ public class Election {
     public Election(String name) {
         this.name = name;
 
-        // TODO initialise this.parties and this.constituencies with an appropriate Map implementations
-
-
-
+        this.parties = new HashMap<>();
+        this.constituencies = new HashSet<>();
     }
 
     /**
@@ -40,11 +38,7 @@ public class Election {
      * @return all parties participating in at least one constituency, without duplicates
      */
     public Collection<Party> getParties() {
-        // TODO: return all parties that have been registered for the election
-        //  hint: there is no need to build a new collection; just return what you have got...
-
-
-        return null; // replace by a proper outcome
+        return parties.values();
     }
 
     /**
@@ -53,53 +47,66 @@ public class Election {
      * @return  the party with given id, or null if no such party exists.
      */
     public Party getParty(int id) {
-        // TODO find the party with the given id
-
-
-        return null; // replace by a proper outcome
+        return parties.get(id);
     }
 
     public Set<? extends Constituency> getConstituencies() {
         return this.constituencies;
     }
 
-    /**
-     * finds all unique candidates across all parties across all constituencies
-     * organised by increasing party-id
-     * @return alle unique candidates organised by increasing party-id
-     */
-    public List<Candidate> getAllCandidates() {
-        // TODO find all candidates organised by increasing party-id
-
-
-        return null; // replace by a proper outcome
-    }
+        /**
+         * finds all unique candidates across all parties across all constituencies
+         * organised by increasing party-id
+         * @return alle unique candidates organised by increasing party-id
+         */
+        public List<Candidate> getAllCandidates() {
+            return constituencies.stream()
+                    .flatMap(constituency -> constituency.getAllCandidates().stream())
+                    .sorted(Comparator.comparing(candidate -> candidate.getParty().getId()))
+                        .distinct()
+                    .collect(Collectors.toList());
+        }
 
     /**
      * Retrieve for the given party the number of Candidates that have been registered per Constituency
      * @param party
      * @return
      */
-    public Map<Constituency,Integer> numberOfRegistrationsByConstituency(Party party) {
-        // TODO build a map with the number of candidate registrations per constituency
-
-
-        return null; // replace by a proper outcome
+    public Map<Constituency, Integer> numberOfRegistrationsByConstituency(Party party) {
+        return constituencies.stream()
+                .collect(Collectors.toMap(
+                        Function.identity(),
+                        constituency -> (int) constituency.getCandidates(party).size()
+                ));
     }
+
 
     /**
      * Finds all Candidates that have a duplicate name against another candidate in the election
      * (can be in the same party or in another party)
      * @return
      */
+
+    /**
+     * HINTS:
+     * getCandidatesWithDuplicateNames:
+     *  Approach-1: first build a Map that counts the number of candidates per given name
+     *              then build the collection from all candidates, excluding those whose name occurs only once.
+     *  Approach-2: build a stream that is sorted by name
+     *              apply a mapMulti that drops unique names but keeps the duplicates
+     *              this approach probably requires complex lambda expressions that are difficult to justify
+     */
+    //first
     public Set<Candidate> getCandidatesWithDuplicateNames() {
-        // TODO build the collection of candidates with duplicate names across parties
-        //   Hint: There are multiple approaches possible,
-        //   if you cannot think of one, read the hints at the bottom of this file.
+        Map<String, Long> nameCounts = getAllCandidates().stream()
+                .map(candidate -> candidate.getFullName().toLowerCase()) // Convert names to lowercase for case-insensitive comparison
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
-
-        return null; // replace by a proper outcome
+        return getAllCandidates().stream()
+                .filter(candidate -> nameCounts.getOrDefault(candidate.getFullName().toLowerCase(), 0L) > 1)
+                .collect(Collectors.toSet());
     }
+
 
     /**
      * Retrieve from all constituencies the combined sub set of all polling stations that are located within the area of the specified zip codes
@@ -110,22 +117,34 @@ public class Election {
      * @return      the sub set of polling stations within the specified zipCode range
      */
     public Collection<PollingStation> getPollingStationsByZipCodeRange(String firstZipCode, String lastZipCode) {
-        // TODO retrieve all polling stations within the area of the given range of zip codes (inclusively)
-
-
-        return null; // replace by a proper outcome
+        return constituencies.stream()
+                .flatMap(con -> con.getPollingStationsByZipCodeRange(firstZipCode, lastZipCode).stream())
+                .peek(pollingStation -> System.out.println("Polling Station Zip Code: " + pollingStation.getZipCode()))
+                .collect(Collectors.toList());
     }
+
+
 
     /**
      * Retrieves per party the total number of votes across all candidates, constituencies and polling stations
      * @return
      */
     public Map<Party, Integer> getVotesByParty() {
-        // TODO calculate the total number of votes per party
+        Map<Party, Integer> votesByParty = new HashMap<>();
 
+        for (Constituency constituency : constituencies) {
+            for (PollingStation pollingStation : constituency.getPollingStations()) {
+                for (Map.Entry<Candidate, Integer> entry : pollingStation.getVotesByCandidate().entrySet()) {
+                    Party party = entry.getKey().getParty();
+                    int votes = entry.getValue();
+                    votesByParty.put(party, votesByParty.getOrDefault(party, 0) + votes);
+                }
+            }
+        }
 
-        return null; // replace by a proper outcome
+        return votesByParty;
     }
+
 
     /**
      * Retrieves per party the total number of votes across all candidates,
@@ -136,11 +155,19 @@ public class Election {
      * @return
      */
     public Map<Party, Integer> getVotesByPartyAcrossPollingStations(Collection<PollingStation> pollingStations) {
-        // TODO calculate the total number of votes per party across the given polling stations
+        Map<Party, Integer> votesByParty = new HashMap<>();
 
+        for (PollingStation pollingStation : pollingStations) {
+            for (Map.Entry<Candidate, Integer> entry : pollingStation.getVotesByCandidate().entrySet()) {
+                Party party = entry.getKey().getParty();
+                int votes = entry.getValue();
+                votesByParty.put(party, votesByParty.getOrDefault(party, 0) + votes);
+            }
+        }
 
-        return null; // replace by a proper outcome
+        return votesByParty;
     }
+
 
 
     /**
@@ -149,12 +176,29 @@ public class Election {
      * The votes percentage by party is calculated from  100.0 * partyVotes / totalVotes;
      * @return  the sorted list of (party,votesPercentage) pairs with the highest percentage upfront
      */
-    public static List<Map.Entry<Party,Double>> sortedElectionResultsByPartyPercentage(int tops, Map<Party, Integer> votesCounts) {
-        // TODO transform the voteCounts input into a sorted list of entries holding votes percentage by party
+    public static List<Map.Entry<Party, Double>> sortedElectionResultsByPartyPercentage(int tops, Map<Party, Integer> votesCounts) {
+        // Calculate the total number of votes
+        double totalVotes = votesCounts.values().stream().mapToInt(Integer::intValue).sum();
 
+        // Calculate the percentage of votes for each party and store it in a map
+        Map<Party, Double> partyPercentageMap = new HashMap<>();
+        for (Map.Entry<Party, Integer> entry : votesCounts.entrySet()) {
+            Party party = entry.getKey();
+            int votes = entry.getValue();
+            double percentage = (votes / totalVotes) * 100.0;
+            partyPercentageMap.put(party, percentage);
+        }
 
-        return null; // replace by a proper outcome
+        // Sort the map entries by percentage in descending order
+        List<Map.Entry<Party, Double>> sortedEntries = partyPercentageMap.entrySet()
+                .stream()
+                .sorted(Map.Entry.<Party, Double>comparingByValue().reversed())
+                .collect(Collectors.toList());
+
+        // Return the top 'tops' entries from the sorted list
+        return sortedEntries.subList(0, Math.min(tops, sortedEntries.size()));
     }
+
 
     /**
      * Find the most representative Polling Station, which has got its votes distribution across all parties
@@ -170,16 +214,24 @@ public class Election {
      * @return the most representative polling station.
      */
     public PollingStation findMostRepresentativePollingStation() {
+        // Calculate the overall total votes count distribution by Party
+        Map<Party, Integer> overallVotesDistribution = getVotesByParty();
 
-        // TODO: calculate the overall total votes count distribution by Party
-        //  and find the PollingStation with the lowest relative deviation between
-        //  its votes count distribution and the overall distribution.
-        //   hint: reuse euclidianVotesDistributionDeviation to calculate a difference metric between two vote counts
-        //   hint: use the .min reducer on a stream of polling stations with a suitable comparator
+        // Create a comparator based on the deviation between polling station's distribution and overall distribution
+        Comparator<PollingStation> deviationComparator = Comparator.comparingDouble(pollingStation -> {
+            Map<Party, Integer> pollingStationVotes = pollingStation.getVotesByParty();
 
+            // Calculate the deviation using euclidianVotesDistributionDeviation method
+            return euclidianVotesDistributionDeviation(overallVotesDistribution, pollingStationVotes);
+        });
 
-        return null; // replace by a proper outcome
+        // Find the polling station with the lowest deviation
+        return constituencies.stream()
+                .flatMap(con -> con.getPollingStations().stream())
+                .min(deviationComparator)
+                .orElse(null);
     }
+
 
     /**
      * Calculates the Euclidian distance between the relative distribution across parties of two voteCounts.
@@ -217,50 +269,119 @@ public class Election {
     }
 
 
+    /**
+     * Prepare a summary for a given party.
+     *
+     * @param partyId the ID of the party for which to generate the summary.
+     * @return a summary of the specified party.
+     */
     public String prepareSummary(int partyId) {
-
         Party party = this.getParty(partyId);
         StringBuilder summary = new StringBuilder()
-                .append("\nSummary of ").append(party).append(":\n");
+                .append("\nSummary of ").append(party.getName()).append(":\n");
 
-        // TODO report total number of candidates in the given party
-        // TODO report the list with all candidates in the given party
-        // TODO report total number of registrations for the given party
-        // TODO report the map of number of registrations by constituency for the given party
+        // Report total number of candidates in the given party
+        int totalCandidatesInParty = getAllCandidates().stream()
+                .filter(candidate -> candidate.getParty().getId() == partyId).toList()
+                .size();
+        summary.append("Total number of candidates in the party: ").append(totalCandidatesInParty).append("\n");
 
+        // Report the list with all candidates in the given party
+        summary.append("List of candidates in the party:\n");
+        getAllCandidates().stream()
+                .filter(candidate -> candidate.getParty().getId() == partyId)
+                .forEach(candidate -> summary.append("- ").append(candidate.getFullName()).append("\n"));
 
+        // Report total number of registrations for the given party
+        Map<Constituency, Integer> registrationsByConstituency = numberOfRegistrationsByConstituency(party);
+        int totalRegistrations = registrationsByConstituency.values().stream()
+                .mapToInt(Integer::intValue)
+                .sum();
+        summary.append("Total number of registrations for the party: ").append(totalRegistrations).append("\n");
 
-
-
+        // Report the map of number of registrations by constituency for the given party
+        summary.append("Number of registrations by constituency:\n");
+        registrationsByConstituency.forEach((constituency, registrations) ->
+                summary.append("- ").append(constituency.getName()).append(": ").append(registrations).append(" registrations\n"));
 
         return summary.toString();
     }
 
-    public String prepareSummary() {
 
+    public String prepareSummary() {
         StringBuilder summary = new StringBuilder()
                 .append("\nElection summary of ").append(this.name).append(":\n");
 
-        // TODO report the total number of parties in the election
-        // TODO report the list of all parties ordered by increasing party-Id
-        // TODO report the total number of constituencies in the election
-        // TODO report the total number of polling stations in the election
-        // TODO report the total number of (different) candidates in the election
-        // TODO report the list with all candidates which have a counter part with a duplicate name in a different party
+        //report the total number of parties in the election
+        int totalParties = getParties().size();
+        summary.append("Total number of parties in the election: ").append(totalParties).append("\n");
 
-        // TODO report the sorted list of overall election results ordered by decreasing party percentage
-        // TODO report the polling stations within the Amsterdam Wibautstraat area with zipcodes between 1091AA and 1091ZZ
-        // TODO report the top 10 sorted election results within the Amsterdam Wibautstraat area
-        //   with zipcodes between 1091AA and 1091ZZ ordered by decreasing party percentage
-        // TODO report the most representative polling station across the election
-        // TODO report the sorted election results by decreasing party percentage of the most representative polling station
+        //report the list of all parties ordered by increasing party-Id
+        List<Party> sortedParties = getParties().stream()
+                .sorted(Comparator.comparing(Party::getId))
+                .collect(Collectors.toList());
+        summary.append("List of all parties ordered by party ID:\n");
+        sortedParties.forEach(party -> summary.append("- ").append(party.getName()).append(" (ID: ").append(party.getId()).append(")\n"));
 
+        //report the total number of constituencies in the election
+        int totalConstituencies = getConstituencies().size();
+        summary.append("Total number of constituencies in the election: ").append(totalConstituencies).append("\n");
 
+        //report the total number of polling stations in the election
+        long totalPollingStations = getConstituencies().stream()
+                .flatMap(con -> con.getPollingStations().stream())
+                .count();
+        summary.append("Total number of polling stations in the election: ").append(totalPollingStations).append("\n");
 
+        //report the total number of (different) candidates in the election
+        List<Candidate> allCandidates = getAllCandidates();
+        int totalCandidates = allCandidates.size();
+        summary.append("Total number of different candidates in the election: ").append(totalCandidates).append("\n");
 
+        //report the list with all candidates which have a counterpart with a duplicate name in a different party
+        Set<Candidate> candidatesWithDuplicateNames = getCandidatesWithDuplicateNames();
+        summary.append("Candidates with duplicate names in different parties:\n");
+        candidatesWithDuplicateNames.forEach(candidate ->
+                summary.append("- ").append(candidate.getFullName()).append(" (Party: ").append(candidate.getParty().getName()).append(")\n"));
+
+        //report the sorted list of overall election results ordered by decreasing party percentage
+        Map<Party, Integer> votesByParty = getVotesByParty();
+        List<Map.Entry<Party, Double>> sortedElectionResults = sortedElectionResultsByPartyPercentage(votesByParty.size(), votesByParty);
+        summary.append("Overall election results ordered by decreasing party percentage:\n");
+        sortedElectionResults.forEach(entry ->
+                summary.append("- ").append(entry.getKey().getName()).append(" (Percentage: ").append(entry.getValue()).append("%)\n"));
+
+        //report the polling stations within the Amsterdam Wibautstraat area with zipcodes between 1091AA and 1091ZZ
+        String firstZipCode = "1091AA";
+        String lastZipCode = "1091ZZ";
+        Collection<PollingStation> pollingStationsInArea = getPollingStationsByZipCodeRange(firstZipCode, lastZipCode);
+        summary.append("Polling stations within Amsterdam Wibautstraat area (Zip Codes: ").append(firstZipCode).append(" to ").append(lastZipCode).append("):\n");
+        pollingStationsInArea.forEach(pollingStation ->
+                summary.append("- ").append(pollingStation.getName()).append(" (Zip Code: ").append(pollingStation.getZipCode()).append(")\n"));
+
+        //report the top 10 sorted election results within the Amsterdam Wibautstraat area
+        // with zipcodes between 1091AA and 1091ZZ ordered by decreasing party percentage
+        Map<Party, Integer> votesByPartyInArea = getVotesByPartyAcrossPollingStations(pollingStationsInArea);
+        List<Map.Entry<Party, Double>> top10ElectionResultsInArea = sortedElectionResultsByPartyPercentage(10, votesByPartyInArea);
+        summary.append("Top 10 election results within Amsterdam Wibautstraat area (Zip Codes: ").append(firstZipCode).append(" to ").append(lastZipCode).append("):\n");
+        top10ElectionResultsInArea.forEach(entry ->
+                summary.append("- ").append(entry.getKey().getName()).append(" (Percentage: ").append(entry.getValue()).append("%)\n"));
+
+        //report the most representative polling station across the election
+        PollingStation mostRepresentativeStation = findMostRepresentativePollingStation();
+        summary.append("Most representative polling station across the election:\n");
+        summary.append("- ").append(mostRepresentativeStation.getName()).append("\n");
+
+        //report the sorted election results by decreasing party percentage of the most representative polling station
+        Map<Party, Integer> votesByPartyInMostRepresentativeStation = mostRepresentativeStation.getVotesByParty();
+        List<Map.Entry<Party, Double>> sortedElectionResultsInMostRepresentativeStation = sortedElectionResultsByPartyPercentage(votesByPartyInMostRepresentativeStation.size(), votesByPartyInMostRepresentativeStation);
+        summary.append("Election results in the most representative polling station ordered by decreasing party percentage:\n");
+        sortedElectionResultsInMostRepresentativeStation.forEach(entry ->
+                summary.append("- ").append(entry.getKey().getName()).append(" (Percentage: ").append(entry.getValue()).append("%)\n"));
 
         return summary.toString();
     }
+
 
     /**
      * Reads all data of Parties, Candidates, Contingencies and PollingStations from available files in the given folder and its subfolders
@@ -330,14 +451,6 @@ public class Election {
         }
     }
 
-    /**
-     * HINTS:
-     * getCandidatesWithDuplicateNames:
-     *  Approach-1: first build a Map that counts the number of candidates per given name
-     *              then build the collection from all candidates, excluding those whose name occurs only once.
-     *  Approach-2: build a stream that is sorted by name
-     *              apply a mapMulti that drops unique names but keeps the duplicates
-     *              this approach probably requires complex lambda expressions that are difficult to justify
-     */
+
 
 }

@@ -67,6 +67,7 @@ class ElectionTest {
         pollingStations = election.getPollingStationsByZipCodeRange("1091AA", "1091ZZ");
         assertEquals(2, pollingStations.size(),
                 String.format("Incorrect number of polling stations found in %s\nExpected: %s", pollingStations, expected));
+
         pollingStations = election.getPollingStationsByZipCodeRange("1091AA", "1091GH");
         assertEquals(2, pollingStations.size(),
                 String.format("Incorrect number of polling stations found in %s\nExpected: %s", pollingStations, expected));
