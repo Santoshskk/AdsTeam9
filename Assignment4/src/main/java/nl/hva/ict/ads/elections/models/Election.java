@@ -164,7 +164,6 @@ public class Election {
                 votesByParty.put(party, votesByParty.getOrDefault(party, 0) + votes);
             }
         }
-
         return votesByParty;
     }
 
