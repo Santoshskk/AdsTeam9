@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
 /**
  * A polling station counts the number of votes cast at the polling station for each candidate in the constituency
  * Each polling station has an Id, but multiple vote counts can be submitted for the same polling station
@@ -29,11 +28,7 @@ public class PollingStation {
         this.id = id;
         this.zipCode = zipCode;
         this.name = name;
-
-        // TODO initialise this.votesByCandidate with an appropriate Map implementation
-
-
-
+        this.votesByCandidate = new HashMap<>();
     }
 
     /**
@@ -41,28 +36,41 @@ public class PollingStation {
      * @param candidate
      * @param numberOfVotes
      */
+    /**
+     * Adds the given number of votes for the candidate in the votes count of this polling station
+     * @param candidate
+     * @param numberOfVotes
+     */
     public void addVotes(Candidate candidate, int numberOfVotes) {
-        // TODO add the number of votes for the candidate
-        //   hint: the best quality solution used one line of code...
-
-
+        //added votes and candidate to map with use of getorddefault
+        votesByCandidate.put(candidate, votesByCandidate.getOrDefault(candidate, 0) + numberOfVotes);
 
     }
+
 
     public int getVotes(Candidate candidate) {
         return this.votesByCandidate.get(candidate);
     }
 
-    /**
-     * Accumulates all votes on candidates into a total vote count per party in the polling station
-     * @return the total number of votes in this polling station per party.
-     */
     public Map<Party, Integer> getVotesByParty() {
-        // TODO accumulate the votes per candidate into a map of total vote counts by party
+        Map<Party, Integer> votesByParty = new HashMap<>();
 
+        // Iterate through the candidates and their votes
+        for (Map.Entry<Candidate, Integer> entry : votesByCandidate.entrySet()) {
+            Candidate candidate = entry.getKey();
+            int numberOfVotes = entry.getValue();
 
-        return null; // replace by a proper outcome
+            // Get the party of the candidate
+            Party party = candidate.getParty();
+
+            // Accumulate the votes for the party
+            int currentPartyVotes = votesByParty.getOrDefault(party, 0);
+            votesByParty.put(party, currentPartyVotes + numberOfVotes);
+        }
+
+        return votesByParty;
     }
+
 
     /**
      * migrate votes from one polling station into another
