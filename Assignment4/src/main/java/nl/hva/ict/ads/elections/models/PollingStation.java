@@ -47,7 +47,6 @@ public class PollingStation {
 
     }
 
-
     public int getVotes(Candidate candidate) {
         return this.votesByCandidate.get(candidate);
     }
