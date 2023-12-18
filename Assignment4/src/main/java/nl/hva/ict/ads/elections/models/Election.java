@@ -116,11 +116,22 @@ public class Election {
      * @param lastZipCode
      * @return      the sub set of polling stations within the specified zipCode range
      */
+
     public Collection<PollingStation> getPollingStationsByZipCodeRange(String firstZipCode, String lastZipCode) {
-        return constituencies.stream()
-                .flatMap(con -> con.getPollingStationsByZipCodeRange(firstZipCode, lastZipCode).stream())
-                .peek(pollingStation -> System.out.println("Polling Station Zip Code: " + pollingStation.getZipCode()))
-                .collect(Collectors.toList());
+        // (done)TO DO retrieve all polling stations within the area of the given range of zip codes (inclusively)
+
+        Collection<PollingStation> pollingStationsInRange = new HashSet<>();
+
+        PollingStation startStation = new PollingStation("0000", firstZipCode, "");
+        PollingStation endStation = new PollingStation("ZZZZ", lastZipCode, "");
+
+        for (Constituency constituency : constituencies) {
+            NavigableSet<PollingStation> pollingStations = constituency.getPollingStations();
+            NavigableSet<PollingStation> stationsWithinRange = pollingStations.subSet(startStation, true, endStation, true);
+            pollingStationsInRange.addAll(stationsWithinRange);
+        }
+
+        return pollingStationsInRange;
     }
 
 
